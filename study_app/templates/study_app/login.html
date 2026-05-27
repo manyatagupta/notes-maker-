@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - StudyMaker AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+    <nav class="bg-white shadow-sm py-4">
+        <div class="max-w-5xl mx-auto px-4 flex justify-between items-center">
+            <a href="{% url 'index' %}" class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 8.56l-1.222.524a1 1 0 000 1.838l7 3a1 1 0 00.788 0l7-3a1 1 0 000-1.838l-1.222-.524-5.384 2.308a1 1 0 01-.788 0L3.31 8.56z"/></svg>
+                StudyMaker AI
+            </a>
+            <div class="flex gap-4">
+                <a href="{% url 'register' %}" class="text-blue-600 font-medium hover:underline">Register</a>
+            </div>
+        </div>
+    </nav>
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
+            <h2 class="text-2xl font-bold text-center text-gray-900 mb-6">Login to your account</h2>
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                {% if form.errors %}
+                <div class="bg-red-50 text-red-500 p-3 rounded-md text-sm">
+                    Invalid username or password.
+                </div>
+                {% endif %}
+                {% for field in form %}
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        <div class="text-red-500 text-xs mt-1">{{ field.errors }}</div>
+                    </div>
+                {% endfor %}
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors">Sign In</button>
+            </form>
+            <p class="mt-4 text-center text-sm text-gray-600">Don't have an account? <a href="{% url 'register' %}" class="text-blue-600 font-medium hover:underline">Register</a></p>
+        </div>
+    </main>
+    <!-- Basic styling for default django form fields inside tailwind -->
+    <style>
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid #d1d5db;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 1px #3b82f6;
+        }
+    </style>
+</body>
+</html>

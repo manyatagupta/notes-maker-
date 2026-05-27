@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Study Materials Generator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for animations or specific overrides */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-btn.active {
+            border-bottom: 2px solid #3b82f6; /* Tailwind blue-500 */
+            color: #3b82f6;
+        }
+        
+        .loader {
+            border-top-color: #3b82f6;
+            -webkit-animation: spinner 1.5s linear infinite;
+            animation: spinner 1.5s linear infinite;
+        }
+        
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans text-gray-800">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm py-4">
+        <div class="max-w-5xl mx-auto px-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 8.56l-1.222.524a1 1 0 000 1.838l7 3a1 1 0 00.788 0l7-3a1 1 0 000-1.838l-1.222-.524-5.384 2.308a1 1 0 01-.788 0L3.31 8.56z"/></svg>
+                StudyMaker AI
+            </h1>
+            <div class="flex gap-4 items-center">
+                {% if user.is_authenticated %}
+                    <span class="text-sm text-gray-600">Hi, {{ user.username }}</span>
+                    <form method="post" action="{% url 'logout' %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="text-blue-600 font-medium hover:underline">Logout</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}" class="text-blue-600 font-medium hover:underline">Login</a>
+                    <a href="{% url 'register' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg transition-colors">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-5xl mx-auto px-4 py-8">
+        
+        <!-- Hero Section & Input -->
+        <div class="text-center mb-10">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">Turn Any YouTube Video Into Study Materials</h2>
+            <p class="text-gray-500 mb-8 max-w-2xl mx-auto">Paste a link below to instantly generate detailed notes, a summary, and a quiz using AI.</p>
+            
+            <div class="max-w-xl mx-auto relative">
+                {% if user.is_authenticated %}
+                <form id="generate-form" class="flex items-center shadow-md rounded-full bg-white overflow-hidden p-1 border border-gray-200">
+                    <input 
+                        type="url" 
+                        id="youtube-url" 
+                        placeholder="https://www.youtube.com/watch?v=..." 
+                        class="w-full px-5 py-3 outline-none text-gray-700 bg-transparent"
+                        required
+                    >
+                    <button 
+                        type="submit" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-full transition-colors flex items-center gap-2"
+                        id="submit-btn"
+                    >
+                        Generate
+                    </button>
+                </form>
+                
+                <!-- Error Message Container -->
+                <p id="error-message" class="text-red-500 text-sm mt-3 hidden"></p>
+                {% else %}
+                <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-xl p-6 text-center">
+                    <p class="mb-4">You need to log in to generate study materials.</p>
+                    <a href="{% url 'login' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors inline-block">Sign In Now</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-container" class="hidden flex-col items-center justify-center py-12">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
+            <h3 class="text-xl font-semibold text-gray-700">Analyzing video & generating materials...</h3>
+            <p class="text-gray-500 text-sm mt-2">This may take a few seconds.</p>
+        </div>
+
+        <!-- Results Section (Initially Hidden) -->
+        <div id="results-container" class="hidden opacity-0 transition-opacity duration-500">
+            
+            <!-- Video Player -->
+            <div class="mb-8 rounded-xl overflow-hidden shadow-lg bg-black aspect-video relative">
+                <iframe id="video-player" class="absolute top-0 left-0 w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+
+            <!-- Tabs -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="flex border-b border-gray-200 bg-gray-50/50">
+                    <button class="tab-btn active flex-1 py-4 font-medium text-gray-600 hover:text-blue-600 transition-colors" data-target="notes-tab">
+                        Detailed Notes
+                    </button>
+                    <button class="tab-btn flex-1 py-4 font-medium text-gray-600 hover:text-blue-600 transition-colors" data-target="summary-tab">
+                        Summary
+                    </button>
+                    <button class="tab-btn flex-1 py-4 font-medium text-gray-600 hover:text-blue-600 transition-colors" data-target="quiz-tab">
+                        Quiz
+                    </button>
+                </div>
+
+                <!-- Tab Contents -->
+                <div class="p-6 md:p-8">
+                    
+                    <!-- Notes Tab -->
+                    <div id="notes-tab" class="tab-content active prose max-w-none text-gray-700 leading-relaxed">
+                        <!-- Populated via JS -->
+                    </div>
+
+                    <!-- Summary Tab -->
+                    <div id="summary-tab" class="tab-content prose max-w-none text-gray-700 text-lg leading-relaxed">
+                        <!-- Populated via JS -->
+                    </div>
+
+                    <!-- Quiz Tab -->
+                    <div id="quiz-tab" class="tab-content">
+                        <div id="quiz-container" class="space-y-8">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('generate-form');
+            const urlInput = document.getElementById('youtube-url');
+            const submitBtn = document.getElementById('submit-btn');
+            const errorMessage = document.getElementById('error-message');
+            const loadingContainer = document.getElementById('loading-container');
+            const resultsContainer = document.getElementById('results-container');
+            const videoPlayer = document.getElementById('video-player');
+            
+            const notesContent = document.getElementById('notes-tab');
+            const summaryContent = document.getElementById('summary-tab');
+            const quizContainer = document.getElementById('quiz-container');
+            
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            // Tab switching logic
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active from all
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active to clicked
+                    btn.classList.add('active');
+                    const targetId = btn.getAttribute('data-target');
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+
+            // Form submission logic
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const url = urlInput.value.trim();
+                    if (!url) return;
+
+                    // Reset UI state
+                    errorMessage.classList.add('hidden');
+                    resultsContainer.classList.add('hidden');
+                    resultsContainer.classList.remove('opacity-100');
+                    loadingContainer.classList.remove('hidden');
+                    loadingContainer.classList.add('flex');
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-70');
+                    
+                    try {
+                        const response = await fetch('/generate/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ url })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (!response.ok) {
+                            throw new Error(data.error || 'Failed to generate materials');
+                        }
+                        
+                        // Populate UI
+                        populateResults(data);
+                        
+                        // Show results
+                        loadingContainer.classList.add('hidden');
+                        loadingContainer.classList.remove('flex');
+                        resultsContainer.classList.remove('hidden');
+                        
+                        // Small delay to allow CSS transition to play
+                        setTimeout(() => {
+                            resultsContainer.classList.add('opacity-100');
+                        }, 50);
+                        
+                    } catch (error) {
+                        loadingContainer.classList.add('hidden');
+                        loadingContainer.classList.remove('flex');
+                        errorMessage.textContent = error.message;
+                        errorMessage.classList.remove('hidden');
+                    } finally {
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-70');
+                    }
+                });
+            }
+
+            function populateResults(data) {
+                // Set iframe src
+                if (data.video_id) {
+                    videoPlayer.src = `https://www.youtube.com/embed/${data.video_id}?autoplay=0`;
+                }
+
+                // Notes
+                if (data.notes) {
+                    // Check if string contains HTML, if not, do simple line break replacement
+                    if (data.notes.includes('<') && data.notes.includes('>')) {
+                        notesContent.innerHTML = data.notes;
+                    } else {
+                        notesContent.innerHTML = `<ul class="list-disc pl-5 space-y-2">
+                            ${data.notes.split('\n').filter(line => line.trim()).map(line => `<li>${line.replace(/^- /, '')}</li>`).join('')}
+                        </ul>`;
+                    }
+                }
+
+                // Summary
+                if (data.summary) {
+                    summaryContent.innerHTML = data.summary.split('\n').filter(p => p.trim()).map(p => `<p class="mb-4">${p}</p>`).join('');
+                }
+
+                // Quiz
+                if (data.quiz && Array.isArray(data.quiz)) {
+                    quizContainer.innerHTML = '';
+                    data.quiz.forEach((q, index) => {
+                        const questionDiv = document.createElement('div');
+                        questionDiv.className = 'bg-gray-50 rounded-lg p-6 border border-gray-100';
+                        
+                        let optionsHtml = '';
+                        q.options.forEach((opt, optIndex) => {
+                            optionsHtml += `
+                                <label class="flex items-start space-x-3 p-3 rounded-md hover:bg-gray-100 cursor-pointer transition-colors">
+                                    <input type="radio" name="q${index}" value="${opt}" class="mt-1 w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                                    <span class="text-gray-700">${opt}</span>
+                                </label>
+                            `;
+                        });
+
+                        questionDiv.innerHTML = `
+                            <h4 class="font-bold text-lg text-gray-800 mb-4">${index + 1}. ${q.question}</h4>
+                            <div class="space-y-2 mb-4">
+                                ${optionsHtml}
+                            </div>
+                            <button type="button" class="text-sm font-medium text-blue-600 hover:text-blue-800 focus:outline-none check-answer-btn" data-answer="${q.answer}">
+                                Show Answer
+                            </button>
+                            <div class="answer-feedback mt-3 hidden text-sm font-medium"></div>
+                        `;
+                        quizContainer.appendChild(questionDiv);
+                    });
+
+                    // Add event listeners for quiz buttons
+                    document.querySelectorAll('.check-answer-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const correctAnswer = this.getAttribute('data-answer');
+                            const parent = this.closest('div');
+                            const selectedOption = parent.querySelector('input[type="radio"]:checked');
+                            const feedback = parent.querySelector('.answer-feedback');
+                            
+                            feedback.classList.remove('hidden', 'text-green-600', 'text-red-600');
+                            
+                            if (!selectedOption) {
+                                feedback.textContent = `Correct Answer: ${correctAnswer}`;
+                                feedback.classList.add('text-blue-600');
+                            } else if (selectedOption.value === correctAnswer) {
+                                feedback.textContent = 'Correct!';
+                                feedback.classList.add('text-green-600');
+                            } else {
+                                feedback.textContent = `Incorrect. The correct answer is: ${correctAnswer}`;
+                                feedback.classList.add('text-red-600');
+                            }
+                            feedback.classList.remove('hidden');
+                        });
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
