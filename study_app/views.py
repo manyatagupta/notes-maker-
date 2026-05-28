@@ -33,13 +33,35 @@ def generate_materials(request):
             if not video_id:
                 return JsonResponse({'error': 'Invalid YouTube URL.'}, status=400)
                 
+            # Check if this user has already generated materials for this video
+            from .models import StudyMaterial
+            existing_material = StudyMaterial.objects.filter(user=request.user, video_id=video_id).first()
+            if existing_material:
+                return JsonResponse({
+                    'notes': existing_material.notes,
+                    'summary': existing_material.summary,
+                    'quiz': existing_material.quiz,
+                    'video_id': video_id,
+                    'title': existing_material.title
+                }, status=200)
+                
             # 1. Fetch transcript
             transcript = get_video_transcript(video_id)
             
             # 2. Generate materials using AI
             materials = generate_study_materials(transcript)
             
-            # 3. Include video ID for embedding
+            # 3. Save to database
+            StudyMaterial.objects.create(
+                user=request.user,
+                video_id=video_id,
+                title=f"Video Notes ({video_id})",
+                notes=materials.get('notes', ''),
+                summary=materials.get('summary', ''),
+                quiz=materials.get('quiz', [])
+            )
+            
+            # 4. Include video ID for embedding
             materials['video_id'] = video_id
             
             return JsonResponse(materials, status=200)
@@ -62,4 +84,13 @@ def register(request):
     else:
         form = UserCreationForm()
     return render(request, 'study_app/register.html', {'form': form})
+
+@login_required
+def dashboard(request):
+    """
+    Shows a history of all generated study materials for the logged-in user.
+    """
+    from .models import StudyMaterial
+    materials = StudyMaterial.objects.filter(user=request.user)
+    return render(request, 'study_app/dashboard.html', {'materials': materials})
 
