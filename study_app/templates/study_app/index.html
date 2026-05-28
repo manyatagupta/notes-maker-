@@ -29,12 +29,19 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        @media print {
+            body * { visibility: hidden; }
+            #results-area, #results-area * { visibility: visible; }
+            #results-area { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen font-sans text-gray-800">
 
     <!-- Navbar -->
-    <nav class="bg-white shadow-sm py-4">
+    <nav class="bg-white shadow-sm py-4 no-print">
         <div class="max-w-5xl mx-auto px-4 flex justify-between items-center">
             <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
                 <svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 8.56l-1.222.524a1 1 0 000 1.838l7 3a1 1 0 00.788 0l7-3a1 1 0 000-1.838l-1.222-.524-5.384 2.308a1 1 0 01-.788 0L3.31 8.56z"/></svg>
@@ -43,6 +50,7 @@
             <div class="flex gap-4 items-center">
                 {% if user.is_authenticated %}
                     <span class="text-sm text-gray-600">Hi, {{ user.username }}</span>
+                    <a href="{% url 'dashboard' %}" class="text-gray-600 hover:text-blue-600 font-medium">Dashboard</a>
                     <form method="post" action="{% url 'logout' %}" class="inline">
                         {% csrf_token %}
                         <button type="submit" class="text-blue-600 font-medium hover:underline">Logout</button>
@@ -59,7 +67,7 @@
     <main class="max-w-5xl mx-auto px-4 py-8">
         
         <!-- Hero Section & Input -->
-        <div class="text-center mb-10">
+        <div class="text-center mb-10 no-print">
             <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">Turn Any YouTube Video Into Study Materials</h2>
             <p class="text-gray-500 mb-8 max-w-2xl mx-auto">Paste a link below to instantly generate detailed notes, a summary, and a quiz using AI.</p>
             
@@ -103,6 +111,14 @@
         <!-- Results Section (Initially Hidden) -->
         <div id="results-container" class="hidden opacity-0 transition-opacity duration-500">
             
+            <!-- PDF Export Button -->
+            <div class="flex justify-end mb-4 no-print">
+                <button onclick="window.print()" class="bg-gray-800 hover:bg-gray-900 text-white font-medium px-4 py-2 rounded-lg flex items-center gap-2 text-sm shadow-sm transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Save as PDF
+                </button>
+            </div>
+
             <!-- Video Player -->
             <div class="mb-8 rounded-xl overflow-hidden shadow-lg bg-black aspect-video relative">
                 <iframe id="video-player" class="absolute top-0 left-0 w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
