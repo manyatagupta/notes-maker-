@@ -361,6 +361,26 @@
             }
 
             function populateResults(data) {
+                // Update export links and share button
+                if (data.material_id) {
+                    document.getElementById('export-word').href = `/export/word/${data.material_id}/`;
+                }
+                
+                if (data.share_id) {
+                    const shareBtn = document.getElementById('share-link-btn');
+                    if (shareBtn) {
+                        shareBtn.setAttribute('data-share-id', data.share_id);
+                        shareBtn.onclick = () => {
+                            const shareUrl = `${window.location.origin}/shared/${data.share_id}/`;
+                            navigator.clipboard.writeText(shareUrl).then(() => {
+                                const originalText = shareBtn.textContent;
+                                shareBtn.textContent = 'Copied!';
+                                setTimeout(() => shareBtn.textContent = originalText, 2000);
+                            });
+                        };
+                    }
+                }
+
                 // Show Word export button if material_id exists
                 const wordBtn = document.getElementById('export-word-btn');
                 if (data.material_id) {

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ material.title }} - Shared Notes</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <script>
+        // Check local storage for theme
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .tab-btn.active {
+            border-bottom: 2px solid #3b82f6;
+            color: #3b82f6;
+        }
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .flashcard-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen font-sans text-gray-800 dark:text-gray-100 transition-colors duration-200">
+    <!-- Navbar -->
+    <nav class="bg-white dark:bg-gray-800 shadow-sm py-4 transition-colors duration-200">
+        <div class="max-w-5xl mx-auto px-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2 dark:text-white">
+                StudyMaker AI - Shared View
+            </h1>
+            <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5">
+                <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.22 4.22a1 1 0 011.415 0l.708.708a1 1 0 01-1.414 1.414l-.708-.708a1 1 0 010-1.415zM12 10a2 2 0 11-4 0 2 2 0 014 0zM17 10a1 1 0 110 2h-1a1 1 0 110-2h1zm-4.22 4.22a1 1 0 010 1.415l-.708.708a1 1 0 01-1.414-1.414l.708-.708a1 1 0 011.415 0zM10 17a1 1 0 11-2 0v-1a1 1 0 112 0v1zm-4.22-4.22a1 1 0 01-1.415 0l-.708-.708a1 1 0 011.414-1.414l.708.708a1 1 0 010 1.415zM3 10a1 1 0 110-2h1a1 1 0 110 2H3zm4.22-4.22a1 1 0 010-1.415l.708-.708a1 1 0 011.414 1.414l-.708.708a1 1 0 01-1.415 0z"></path></svg>
+            </button>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-4 py-8">
+        <h2 class="text-3xl font-extrabold text-center text-gray-900 dark:text-white mb-8">{{ material.title }}</h2>
+
+        <div id="results-container">
+            <!-- Video Player -->
+            {% if material.video_id %}
+            <div class="mb-8 rounded-xl overflow-hidden shadow-lg bg-black aspect-video relative">
+                <iframe id="video-player" class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/{{ material.video_id }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            {% endif %}
+
+            <!-- Tabs -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+                <div class="flex border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+                    <button class="tab-btn active flex-1 py-4 font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-colors" data-target="notes-tab">Detailed Notes</button>
+                    <button class="tab-btn flex-1 py-4 font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-colors" data-target="summary-tab">Summary</button>
+                    <button class="tab-btn flex-1 py-4 font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-colors" data-target="flashcards-tab">Flashcards</button>
+                    <button class="tab-btn flex-1 py-4 font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-colors" data-target="quiz-tab">Quiz</button>
+                </div>
+
+                <div class="p-6 md:p-8">
+                    <div id="notes-tab" class="tab-content active prose max-w-none text-gray-700 dark:text-gray-200 leading-relaxed"></div>
+                    <div id="summary-tab" class="tab-content prose max-w-none text-gray-700 dark:text-gray-200 text-lg leading-relaxed"></div>
+                    
+                    <div id="flashcards-tab" class="tab-content">
+                        <div id="flashcards-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                    </div>
+
+                    <div id="quiz-tab" class="tab-content">
+                        <div id="quiz-container" class="space-y-8"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    {{ material.notes|json_script:"notes-data" }}
+    {{ material.summary|json_script:"summary-data" }}
+    {{ material.quiz|json_script:"quiz-data" }}
+    {{ material.flashcards|json_script:"flashcards-data" }}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById(btn.getAttribute('data-target')).classList.add('active');
+                });
+            });
+
+            // Theme Toggle Logic
+            const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+            const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+            const themeToggleBtn = document.getElementById('theme-toggle');
+
+            if (document.documentElement.classList.contains('dark')) {
+                themeToggleLightIcon.classList.remove('hidden');
+            } else {
+                themeToggleDarkIcon.classList.remove('hidden');
+            }
+
+            themeToggleBtn.addEventListener('click', function() {
+                themeToggleDarkIcon.classList.toggle('hidden');
+                themeToggleLightIcon.classList.toggle('hidden');
+                document.documentElement.classList.toggle('dark');
+                if (document.documentElement.classList.contains('dark')) {
+                    localStorage.setItem('color-theme', 'dark');
+                } else {
+                    localStorage.setItem('color-theme', 'light');
+                }
+            });
+
+            // Load Data
+            const notes = JSON.parse(document.getElementById('notes-data').textContent);
+            const summary = JSON.parse(document.getElementById('summary-data').textContent);
+            const quiz = JSON.parse(document.getElementById('quiz-data').textContent);
+            const flashcards = JSON.parse(document.getElementById('flashcards-data').textContent);
+            const videoId = "{{ material.video_id }}";
+
+            // Notes
+            const notesContent = document.getElementById('notes-tab');
+            if (notes) {
+                let notesHtml = notes;
+                if (!notesHtml.includes('<') || !notesHtml.includes('>')) {
+                    notesHtml = `<ul class="list-disc pl-5 space-y-2">
+                        ${notes.split('\\n').filter(line => line.trim()).map(line => `<li>${line.replace(/^- /, '')}</li>`).join('')}
+                    </ul>`;
+                }
+                
+                notesHtml = notesHtml.replace(/\\[(\\d+):(\\d+)(?::(\\d+))?\\]/g, (match, p1, p2, p3) => {
+                    let totalSeconds = 0;
+                    if (p3 !== undefined) {
+                        totalSeconds = parseInt(p1) * 3600 + parseInt(p2) * 60 + parseInt(p3);
+                    } else {
+                        totalSeconds = parseInt(p1) * 60 + parseInt(p2);
+                    }
+                    if (videoId) {
+                        return `<a href="javascript:void(0)" onclick="document.getElementById('video-player').src='https://www.youtube.com/embed/${videoId}?start=${totalSeconds}&autoplay=1'" class="text-blue-600 dark:text-blue-400 hover:underline font-mono">${match}</a>`;
+                    } else {
+                        return `<span class="font-mono text-gray-500">${match}</span>`;
+                    }
+                });
+                
+                notesContent.innerHTML = notesHtml;
+            }
+
+            // Summary
+            const summaryContent = document.getElementById('summary-tab');
+            if (summary) {
+                summaryContent.innerHTML = summary.split('\\n').filter(p => p.trim()).map(p => `<p class="mb-4">${p}</p>`).join('');
+            }
+
+            // Flashcards
+            const flashcardsContainer = document.getElementById('flashcards-container');
+            if (flashcards && Array.isArray(flashcards)) {
+                flashcards.forEach(card => {
+                    const cardDiv = document.createElement('div');
+                    cardDiv.className = 'flashcard perspective-1000 w-full h-64';
+                    cardDiv.innerHTML = `
+                        <div class="flashcard-inner w-full h-full relative rounded-xl shadow-md border border-gray-100">
+                            <div class="absolute w-full h-full backface-hidden flex items-center justify-center p-6 bg-white dark:bg-gray-800 rounded-xl">
+                                <h3 class="text-xl font-bold text-center text-gray-800 dark:text-white">${card.front}</h3>
+                            </div>
+                            <div class="absolute w-full h-full backface-hidden rotate-y-180 flex items-center justify-center p-6 bg-blue-50 dark:bg-blue-900 rounded-xl overflow-y-auto">
+                                <p class="text-lg text-center text-gray-700 dark:text-gray-200">${card.back}</p>
+                            </div>
+                        </div>
+                    `;
+                    cardDiv.addEventListener('click', () => cardDiv.classList.toggle('flipped'));
+                    flashcardsContainer.appendChild(cardDiv);
+                });
+            }
+
+            // Quiz
+            const quizContainer = document.getElementById('quiz-container');
+            if (quiz && Array.isArray(quiz)) {
+                quiz.forEach((q, index) => {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.className = 'bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border border-gray-100 dark:border-gray-600';
+                    let optionsHtml = '';
+                    q.options.forEach(opt => {
+                        optionsHtml += `
+                            <label class="flex items-start space-x-3 p-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer transition-colors">
+                                <input type="radio" name="q${index}" value="${opt}" class="mt-1 w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                                <span class="text-gray-700 dark:text-gray-200">${opt}</span>
+                            </label>
+                        `;
+                    });
+                    questionDiv.innerHTML = `
+                        <h4 class="font-bold text-lg text-gray-800 dark:text-white mb-4">${index + 1}. ${q.question}</h4>
+                        <div class="space-y-2 mb-4">${optionsHtml}</div>
+                        <button type="button" class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 focus:outline-none check-answer-btn" data-answer="${q.answer}">
+                            Show Answer
+                        </button>
+                        <div class="answer-feedback mt-3 hidden text-sm font-medium"></div>
+                    `;
+                    quizContainer.appendChild(questionDiv);
+                });
+
+                document.querySelectorAll('.check-answer-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const correctAnswer = this.getAttribute('data-answer');
+                        const parent = this.closest('div');
+                        const selectedOption = parent.querySelector('input[type="radio"]:checked');
+                        const feedback = parent.querySelector('.answer-feedback');
+                        
+                        feedback.classList.remove('hidden', 'text-green-600', 'text-red-600', 'text-blue-600', 'dark:text-green-400', 'dark:text-red-400', 'dark:text-blue-400');
+                        
+                        if (!selectedOption) {
+                            feedback.textContent = `Correct Answer: ${correctAnswer}`;
+                            feedback.classList.add('text-blue-600', 'dark:text-blue-400');
+                        } else if (selectedOption.value === correctAnswer) {
+                            feedback.textContent = 'Correct!';
+                            feedback.classList.add('text-green-600', 'dark:text-green-400');
+                        } else {
+                            feedback.textContent = `Incorrect. The correct answer is: ${correctAnswer}`;
+                            feedback.classList.add('text-red-600', 'dark:text-red-400');
+                        }
+                        feedback.classList.remove('hidden');
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

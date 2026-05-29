@@ -10,4 +10,5 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('register/', views.register, name='register'),
     path('export/word/<int:material_id>/', views.export_word, name='export_word'),
+    path('shared/<uuid:share_id>/', views.shared_material, name='shared_material'),
 ]

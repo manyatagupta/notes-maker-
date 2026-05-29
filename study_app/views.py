@@ -51,7 +51,8 @@ def generate_materials(request):
                         'flashcards': existing_material.flashcards,
                         'video_id': video_id,
                         'title': existing_material.title,
-                        'material_id': existing_material.id
+                        'material_id': existing_material.id,
+                        'share_id': str(existing_material.share_id)
                     }, status=200)
                     
                 # 1. Fetch transcript
@@ -82,6 +83,8 @@ def generate_materials(request):
                 materials['video_id'] = video_id
             else:
                 materials['video_id'] = None
+                
+            materials['share_id'] = str(new_material.share_id)
             
             return JsonResponse(materials, status=200)
             
@@ -147,4 +150,10 @@ def export_word(request, material_id):
     )
     response['Content-Disposition'] = f'attachment; filename="StudyMaterial_{material_id}.docx"'
     return response
+
+def shared_material(request, share_id):
+    from .models import StudyMaterial
+    material = get_object_or_404(StudyMaterial, share_id=share_id)
+    # We can render a simplified template or reuse index.html with a flag
+    return render(request, 'study_app/shared.html', {'material': material})
 
