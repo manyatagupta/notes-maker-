@@ -33,13 +33,20 @@ def get_video_transcript(video_id):
             except StopIteration:
                 raise Exception("No transcripts available for this video.")
                 
-        # Fetch the actual transcript data (in its original language)
-        # We rely on the LLM (Groq) to translate it to English during processing.
+        # Fetch the actual transcript data
         transcript_data = transcript.fetch()
-        
-        # Format the transcript into a plain text string
-        formatter = TextFormatter()
-        text_formatted = formatter.format_transcript(transcript_data)
+
+        # Format the transcript into a plain text string with timestamps
+        formatted_lines = []
+        for entry in transcript_data:
+            start_time = int(entry.get('start', 0))
+            minutes = start_time // 60
+            seconds = start_time % 60
+            time_str = f"[{minutes:02d}:{seconds:02d}]"
+            text = entry.get('text', '').replace('\n', ' ')
+            formatted_lines.append(f"{time_str} {text}")
+            
+        text_formatted = "\n".join(formatted_lines)
         
         return text_formatted
     except Exception as e:

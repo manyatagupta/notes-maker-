@@ -22,7 +22,7 @@ def generate_study_materials(transcript_text):
     The user will provide the transcript of a YouTube video or the text of an article. 
     The text might be in Hindi or another language, but YOU MUST TRANSLATE and generate your entire output strictly in ENGLISH.
     You must output a JSON object containing the following keys:
-    1. "notes": Detailed, section-by-section bullet points capturing all key concepts in English. Format as a string of HTML bullet points or Markdown.
+    1. "notes": Detailed, section-by-section bullet points capturing all key concepts in English. Format as a string of HTML bullet points or Markdown. If timestamps (e.g. [01:23]) are present in the text, preserve them in your notes at relevant points so the user knows when the topic was discussed.
     2. "summary": A concise 2-3 paragraph overview of the video content in English.
     3. "quiz": An array of 5 Multiple Choice Questions (MCQs) in English based strictly on the content. Each question should be an object with "question", "options" (array of 4 strings), and "answer" (the correct string from options).
     4. "flashcards": An array of 5 to 10 flashcards in English. Each flashcard should be an object with "front" (the term/concept) and "back" (the definition/explanation).

@@ -379,14 +379,31 @@
 
                 // Notes
                 if (data.notes) {
-                    // Check if string contains HTML, if not, do simple line break replacement
-                    if (data.notes.includes('<') && data.notes.includes('>')) {
-                        notesContent.innerHTML = data.notes;
-                    } else {
-                        notesContent.innerHTML = `<ul class="list-disc pl-5 space-y-2">
+                    let notesHtml = data.notes;
+                    if (!notesHtml.includes('<') || !notesHtml.includes('>')) {
+                        notesHtml = `<ul class="list-disc pl-5 space-y-2">
                             ${data.notes.split('\n').filter(line => line.trim()).map(line => `<li>${line.replace(/^- /, '')}</li>`).join('')}
                         </ul>`;
                     }
+                    
+                    // Parse timestamps [MM:SS] or [HH:MM:SS] into clickable links
+                    notesHtml = notesHtml.replace(/\[(\d+):(\d+)(?::(\d+))?\]/g, (match, p1, p2, p3) => {
+                        let totalSeconds = 0;
+                        if (p3 !== undefined) {
+                            // Format is HH:MM:SS
+                            totalSeconds = parseInt(p1) * 3600 + parseInt(p2) * 60 + parseInt(p3);
+                        } else {
+                            // Format is MM:SS
+                            totalSeconds = parseInt(p1) * 60 + parseInt(p2);
+                        }
+                        if (data.video_id) {
+                            return `<a href="javascript:void(0)" onclick="document.getElementById('video-player').src='https://www.youtube.com/embed/${data.video_id}?start=${totalSeconds}&autoplay=1'" class="text-blue-600 dark:text-blue-400 hover:underline font-mono">${match}</a>`;
+                        } else {
+                            return `<span class="font-mono text-gray-500">${match}</span>`;
+                        }
+                    });
+                    
+                    notesContent.innerHTML = notesHtml;
                 }
 
                 // Summary
