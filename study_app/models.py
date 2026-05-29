@@ -8,6 +8,7 @@ class StudyMaterial(models.Model):
     notes = models.TextField()
     summary = models.TextField()
     quiz = models.JSONField()
+    flashcards = models.JSONField(default=list)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

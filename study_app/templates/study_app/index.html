@@ -50,6 +50,28 @@
             #results-area { position: absolute; left: 0; top: 0; width: 100%; }
             .no-print { display: none !important; }
         }
+
+        /* Flashcard Animations */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        .flashcard-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 min-h-screen font-sans text-gray-800 dark:text-gray-100 transition-colors duration-200">
@@ -156,6 +178,9 @@
                     <button class="tab-btn flex-1 py-4 font-medium text-gray-600 hover:text-blue-600 transition-colors" data-target="summary-tab">
                         Summary
                     </button>
+                    <button class="tab-btn flex-1 py-4 font-medium text-gray-600 hover:text-blue-600 transition-colors" data-target="flashcards-tab">
+                        Flashcards
+                    </button>
                     <button class="tab-btn flex-1 py-4 font-medium text-gray-600 hover:text-blue-600 transition-colors" data-target="quiz-tab">
                         Quiz
                     </button>
@@ -172,6 +197,13 @@
                     <!-- Summary Tab -->
                     <div id="summary-tab" class="tab-content prose max-w-none text-gray-700 text-lg leading-relaxed">
                         <!-- Populated via JS -->
+                    </div>
+
+                    <!-- Flashcards Tab -->
+                    <div id="flashcards-tab" class="tab-content">
+                        <div id="flashcards-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Populated via JS -->
+                        </div>
                     </div>
 
                     <!-- Quiz Tab -->
@@ -199,6 +231,7 @@
             
             const notesContent = document.getElementById('notes-tab');
             const summaryContent = document.getElementById('summary-tab');
+            const flashcardsContainer = document.getElementById('flashcards-container');
             const quizContainer = document.getElementById('quiz-container');
             
             const tabBtns = document.querySelectorAll('.tab-btn');
@@ -359,6 +392,29 @@
                 // Summary
                 if (data.summary) {
                     summaryContent.innerHTML = data.summary.split('\n').filter(p => p.trim()).map(p => `<p class="mb-4">${p}</p>`).join('');
+                }
+
+                // Flashcards
+                if (data.flashcards && Array.isArray(data.flashcards)) {
+                    flashcardsContainer.innerHTML = '';
+                    data.flashcards.forEach((card, index) => {
+                        const cardDiv = document.createElement('div');
+                        cardDiv.className = 'flashcard perspective-1000 w-full h-64';
+                        cardDiv.innerHTML = `
+                            <div class="flashcard-inner w-full h-full relative rounded-xl shadow-md border border-gray-100">
+                                <div class="absolute w-full h-full backface-hidden flex items-center justify-center p-6 bg-white dark:bg-gray-800 rounded-xl">
+                                    <h3 class="text-xl font-bold text-center text-gray-800 dark:text-white">${card.front}</h3>
+                                </div>
+                                <div class="absolute w-full h-full backface-hidden rotate-y-180 flex items-center justify-center p-6 bg-blue-50 dark:bg-blue-900 rounded-xl overflow-y-auto">
+                                    <p class="text-lg text-center text-gray-700 dark:text-gray-200">${card.back}</p>
+                                </div>
+                            </div>
+                        `;
+                        cardDiv.addEventListener('click', () => {
+                            cardDiv.classList.toggle('flipped');
+                        });
+                        flashcardsContainer.appendChild(cardDiv);
+                    });
                 }
 
                 // Quiz

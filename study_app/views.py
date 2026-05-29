@@ -43,6 +43,7 @@ def generate_materials(request):
                     'notes': existing_material.notes,
                     'summary': existing_material.summary,
                     'quiz': existing_material.quiz,
+                    'flashcards': existing_material.flashcards,
                     'video_id': video_id,
                     'title': existing_material.title,
                     'material_id': existing_material.id
@@ -61,7 +62,8 @@ def generate_materials(request):
                 title=f"Video Notes ({video_id})",
                 notes=materials.get('notes', ''),
                 summary=materials.get('summary', ''),
-                quiz=materials.get('quiz', [])
+                quiz=materials.get('quiz', []),
+                flashcards=materials.get('flashcards', [])
             )
             materials['material_id'] = new_material.id
             

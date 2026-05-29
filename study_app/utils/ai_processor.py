@@ -25,6 +25,7 @@ def generate_study_materials(transcript_text):
     1. "notes": Detailed, section-by-section bullet points capturing all key concepts in English. Format as a string of HTML bullet points or Markdown.
     2. "summary": A concise 2-3 paragraph overview of the video content in English.
     3. "quiz": An array of 5 Multiple Choice Questions (MCQs) in English based strictly on the content. Each question should be an object with "question", "options" (array of 4 strings), and "answer" (the correct string from options).
+    4. "flashcards": An array of 5 to 10 flashcards in English. Each flashcard should be an object with "front" (the term/concept) and "back" (the definition/explanation).
     
     Ensure your response is ONLY a valid JSON object, with no markdown code block wrapping or additional text.
     """
