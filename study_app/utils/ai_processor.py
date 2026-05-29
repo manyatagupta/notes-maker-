@@ -19,8 +19,8 @@ def generate_study_materials(transcript_text):
 
     system_prompt = """
     You are an expert educational AI assistant.
-    The user will provide the transcript of a YouTube video. 
-    The transcript might be in Hindi or another language, but YOU MUST TRANSLATE and generate your entire output strictly in ENGLISH.
+    The user will provide the transcript of a YouTube video or the text of an article. 
+    The text might be in Hindi or another language, but YOU MUST TRANSLATE and generate your entire output strictly in ENGLISH.
     You must output a JSON object containing the following keys:
     1. "notes": Detailed, section-by-section bullet points capturing all key concepts in English. Format as a string of HTML bullet points or Markdown.
     2. "summary": A concise 2-3 paragraph overview of the video content in English.

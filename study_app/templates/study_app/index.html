@@ -109,17 +109,17 @@
         
         <!-- Hero Section & Input -->
         <div class="text-center mb-10 no-print">
-            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">Turn Any YouTube Video Into Study Materials</h2>
-            <p class="text-gray-500 mb-8 max-w-2xl mx-auto">Paste a link below to instantly generate detailed notes, a summary, and a quiz using AI.</p>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-4">Turn Any YouTube Video or Article Into Study Materials</h2>
+            <p class="text-gray-500 dark:text-gray-400 mb-8 max-w-2xl mx-auto">Paste a link below to instantly generate detailed notes, a summary, flashcards, and a quiz using AI.</p>
             
             <div class="max-w-xl mx-auto relative">
                 {% if user.is_authenticated %}
-                <form id="generate-form" class="flex items-center shadow-md rounded-full bg-white overflow-hidden p-1 border border-gray-200">
+                <form id="generate-form" class="flex items-center shadow-md rounded-full bg-white dark:bg-gray-800 overflow-hidden p-1 border border-gray-200 dark:border-gray-700">
                     <input 
                         type="url" 
                         id="youtube-url" 
-                        placeholder="https://www.youtube.com/watch?v=..." 
-                        class="w-full px-5 py-3 outline-none text-gray-700 bg-transparent"
+                        placeholder="https://www.youtube.com/... or https://article.com/..." 
+                        class="w-full px-5 py-3 outline-none text-gray-700 dark:text-gray-200 bg-transparent"
                         required
                     >
                     <button 

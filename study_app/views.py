@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from .utils.youtube import extract_video_id, get_video_transcript
+from .utils.scraper import is_youtube_url, get_article_text
 from .utils.ai_processor import generate_study_materials
 
 def index(request):
@@ -31,35 +32,44 @@ def generate_materials(request):
             if not url:
                 return JsonResponse({'error': 'No URL provided.'}, status=400)
             
-            video_id = extract_video_id(url)
-            if not video_id:
-                return JsonResponse({'error': 'Invalid YouTube URL.'}, status=400)
-                
-            # Check if this user has already generated materials for this video
-            from .models import StudyMaterial
-            existing_material = StudyMaterial.objects.filter(user=request.user, video_id=video_id).first()
-            if existing_material:
-                return JsonResponse({
-                    'notes': existing_material.notes,
-                    'summary': existing_material.summary,
-                    'quiz': existing_material.quiz,
-                    'flashcards': existing_material.flashcards,
-                    'video_id': video_id,
-                    'title': existing_material.title,
-                    'material_id': existing_material.id
-                }, status=200)
-                
-            # 1. Fetch transcript
-            transcript = get_video_transcript(video_id)
+            is_yt = is_youtube_url(url)
+            video_id = ""
+            
+            if is_yt:
+                video_id = extract_video_id(url)
+                if not video_id:
+                    return JsonResponse({'error': 'Invalid YouTube URL.'}, status=400)
+                    
+                # Check if this user has already generated materials for this video
+                from .models import StudyMaterial
+                existing_material = StudyMaterial.objects.filter(user=request.user, video_id=video_id).first()
+                if existing_material:
+                    return JsonResponse({
+                        'notes': existing_material.notes,
+                        'summary': existing_material.summary,
+                        'quiz': existing_material.quiz,
+                        'flashcards': existing_material.flashcards,
+                        'video_id': video_id,
+                        'title': existing_material.title,
+                        'material_id': existing_material.id
+                    }, status=200)
+                    
+                # 1. Fetch transcript
+                content_text = get_video_transcript(video_id)
+                title = f"Video Notes ({video_id})"
+            else:
+                # Treat as article
+                content_text = get_article_text(url)
+                title = f"Article Notes"
             
             # 2. Generate materials using AI
-            materials = generate_study_materials(transcript)
+            materials = generate_study_materials(content_text)
             
             # 3. Save to database
             new_material = StudyMaterial.objects.create(
                 user=request.user,
-                video_id=video_id,
-                title=f"Video Notes ({video_id})",
+                video_id=video_id, # Can be empty for articles
+                title=title,
                 notes=materials.get('notes', ''),
                 summary=materials.get('summary', ''),
                 quiz=materials.get('quiz', []),
@@ -68,7 +78,10 @@ def generate_materials(request):
             materials['material_id'] = new_material.id
             
             # 4. Include video ID for embedding
-            materials['video_id'] = video_id
+            if is_yt:
+                materials['video_id'] = video_id
+            else:
+                materials['video_id'] = None
             
             return JsonResponse(materials, status=200)
             
