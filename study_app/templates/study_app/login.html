@@ -65,10 +65,15 @@
             border: 1px solid #d1d5db;
             outline: none;
             transition: border-color 0.2s;
+            background-color: transparent;
         }
         input[type="text"]:focus, input[type="password"]:focus {
             border-color: #3b82f6;
             box-shadow: 0 0 0 1px #3b82f6;
+        }
+        .dark input[type="text"], .dark input[type="password"] {
+            border-color: #4b5563; /* gray-600 */
+            color: #f3f4f6; /* gray-100 */
         }
     </style>
 </body>

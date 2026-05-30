@@ -55,17 +55,22 @@
         </div>
     </main>
     <style>
-        input[type="text"], input[type="password"] {
+        input[type="text"], input[type="password"], input[type="email"] {
             width: 100%;
             padding: 0.5rem 0.75rem;
             border-radius: 0.375rem;
             border: 1px solid #d1d5db;
             outline: none;
             transition: border-color 0.2s;
+            background-color: transparent;
         }
-        input[type="text"]:focus, input[type="password"]:focus {
+        input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
             border-color: #3b82f6;
             box-shadow: 0 0 0 1px #3b82f6;
+        }
+        .dark input[type="text"], .dark input[type="password"], .dark input[type="email"] {
+            border-color: #4b5563; /* gray-600 */
+            color: #f3f4f6; /* gray-100 */
         }
         ul.errorlist {
             color: #ef4444; /* red-500 */
