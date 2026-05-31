@@ -7,15 +7,39 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 from .utils.youtube import extract_video_id, get_video_transcript
 from .utils.scraper import is_youtube_url, get_article_text
 from .utils.ai_processor import generate_study_materials
+from .models import StudyMaterial, Profile
+from django.db.models import Q
+
+def update_streak(user):
+    import datetime
+    profile, created = Profile.objects.get_or_create(user=user)
+    
+    last_active = profile.last_active_date
+    if isinstance(last_active, datetime.datetime):
+        last_active = last_active.date()
+        
+    today = timezone.now().date()
+    if last_active < today:
+        if (today - last_active).days == 1:
+            profile.current_streak += 1
+        else:
+            profile.current_streak = 1
+        profile.last_active_date = today
+        profile.save()
+    return profile.current_streak
 
 def index(request):
     """
     Renders the main frontend page.
     """
-    return render(request, 'study_app/index.html')
+    streak = 0
+    if request.user.is_authenticated:
+        streak = update_streak(request.user)
+    return render(request, 'study_app/index.html', {'streak': streak})
 
 @csrf_exempt
 @login_required
@@ -49,6 +73,7 @@ def generate_materials(request):
                         'summary': existing_material.summary,
                         'quiz': existing_material.quiz,
                         'flashcards': existing_material.flashcards,
+                        'mindmap': existing_material.mindmap,
                         'video_id': video_id,
                         'title': existing_material.title,
                         'material_id': existing_material.id,
@@ -74,7 +99,8 @@ def generate_materials(request):
                 notes=materials.get('notes', ''),
                 summary=materials.get('summary', ''),
                 quiz=materials.get('quiz', []),
-                flashcards=materials.get('flashcards', [])
+                flashcards=materials.get('flashcards', []),
+                mindmap=materials.get('mindmap', '')
             )
             materials['material_id'] = new_material.id
             
@@ -112,9 +138,34 @@ def dashboard(request):
     """
     Shows a history of all generated study materials for the logged-in user.
     """
-    from .models import StudyMaterial
+    streak = update_streak(request.user)
     materials = StudyMaterial.objects.filter(user=request.user)
-    return render(request, 'study_app/dashboard.html', {'materials': materials})
+    
+    # Search functionality
+    query = request.GET.get('q')
+    if query:
+        materials = materials.filter(
+            Q(title__icontains=query) | Q(summary__icontains=query)
+        )
+        
+    # Order by favorite first, then date
+    materials = materials.order_by('-is_favorite', '-created_at')
+    
+    return render(request, 'study_app/dashboard.html', {
+        'materials': materials,
+        'streak': streak,
+        'query': query or ''
+    })
+
+@csrf_exempt
+@login_required
+def toggle_favorite(request, material_id):
+    if request.method == 'POST':
+        material = get_object_or_404(StudyMaterial, id=material_id, user=request.user)
+        material.is_favorite = not material.is_favorite
+        material.save()
+        return JsonResponse({'is_favorite': material.is_favorite})
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
 @login_required
 def export_word(request, material_id):
