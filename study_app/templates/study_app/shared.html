@@ -6,6 +6,8 @@
     <title>{{ material.title }} - Shared Notes</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true});</script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -72,6 +74,7 @@
                     <button class="tab-btn flex-1 py-4 font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-colors" data-target="summary-tab">Summary</button>
                     <button class="tab-btn flex-1 py-4 font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-colors" data-target="flashcards-tab">Flashcards</button>
                     <button class="tab-btn flex-1 py-4 font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-colors" data-target="quiz-tab">Quiz</button>
+                    <button class="tab-btn flex-1 py-4 font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-colors" data-target="mindmap-tab">Mind Map</button>
                 </div>
 
                 <div class="p-6 md:p-8">
@@ -85,6 +88,10 @@
                     <div id="quiz-tab" class="tab-content">
                         <div id="quiz-container" class="space-y-8"></div>
                     </div>
+                    
+                    <div id="mindmap-tab" class="tab-content">
+                        <div id="mindmap-container" class="w-full overflow-x-auto p-4 bg-gray-50 dark:bg-gray-800 rounded-lg flex justify-center"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -94,6 +101,7 @@
     {{ material.summary|json_script:"summary-data" }}
     {{ material.quiz|json_script:"quiz-data" }}
     {{ material.flashcards|json_script:"flashcards-data" }}
+    {{ material.mindmap|json_script:"mindmap-data" }}
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -136,6 +144,7 @@
             const summary = JSON.parse(document.getElementById('summary-data').textContent);
             const quiz = JSON.parse(document.getElementById('quiz-data').textContent);
             const flashcards = JSON.parse(document.getElementById('flashcards-data').textContent);
+            const mindmap = JSON.parse(document.getElementById('mindmap-data').textContent);
             const videoId = "{{ material.video_id }}";
 
             // Notes
@@ -240,6 +249,13 @@
                         feedback.classList.remove('hidden');
                     });
                 });
+            }
+
+            // Mindmap
+            const mindmapContainer = document.getElementById('mindmap-container');
+            if (mindmap) {
+                mindmapContainer.innerHTML = `<div class="mermaid">${mindmap.replace(/```mermaid/g, '').replace(/```/g, '')}</div>`;
+                try { mermaid.init(undefined, document.querySelectorAll('.mermaid')); } catch(e) { console.error("Mermaid error:", e); }
             }
         });
     </script>
