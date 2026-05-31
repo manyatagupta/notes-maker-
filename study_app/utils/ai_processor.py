@@ -26,6 +26,7 @@ def generate_study_materials(transcript_text):
     2. "summary": A concise 2-3 paragraph overview of the video content in English.
     3. "quiz": An array of 5 Multiple Choice Questions (MCQs) in English based strictly on the content. Each question should be an object with "question", "options" (array of 4 strings), and "answer" (the correct string from options).
     4. "flashcards": An array of 5 to 10 flashcards in English. Each flashcard should be an object with "front" (the term/concept) and "back" (the definition/explanation).
+    5. "mindmap": A Mermaid JS graph strictly in Mermaid syntax representing a mind map of the core concepts in the text (use flowchart or mindmap syntax). Do not wrap in markdown tags like ```mermaid.
     
     Ensure your response is ONLY a valid JSON object, with no markdown code block wrapping or additional text.
     """
