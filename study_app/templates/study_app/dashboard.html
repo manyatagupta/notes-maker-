@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - StudyMaker AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -46,6 +47,14 @@
 
     <!-- Content -->
     <div class="max-w-5xl mx-auto px-4 py-8">
+        
+        <!-- Analytics Chart -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8 border border-gray-100 dark:border-gray-700">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Study Activity (Last 7 Days)</h3>
+            <div class="w-full" style="height: 250px;">
+                <canvas id="activityChart"></canvas>
+            </div>
+        </div>
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
             <h2 class="text-3xl font-bold text-gray-800 dark:text-white">Your Saved Notes</h2>
             <form method="get" action="{% url 'dashboard' %}" class="flex gap-2 w-full sm:w-auto">
@@ -64,7 +73,10 @@
                         {% if mat.is_favorite %}⭐{% else %}☆{% endif %}
                     </button>
                 </div>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{{ mat.created_at|date:"M d, Y" }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">{{ mat.created_at|date:"M d, Y" }}</p>
+                <div class="mb-4">
+                    <input type="text" class="tag-input w-full px-2 py-1 text-sm border rounded bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500" data-id="{{ mat.id }}" value="{{ mat.tags|default:'' }}" placeholder="Add tags (e.g. #math, #science)...">
+                </div>
                 <div class="flex gap-2">
                     <a href="{% url 'index' %}?video_id={{ mat.video_id }}" class="bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-900 transition">View Details</a>
                     <a href="https://youtube.com/watch?v={{ mat.video_id }}" target="_blank" class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-600 transition">Watch</a>
@@ -124,6 +136,53 @@
                         }
                     } catch(e) {
                         console.error('Error toggling favorite', e);
+                    }
+                });
+            });
+
+            // Analytics Chart
+            const ctx = document.getElementById('activityChart').getContext('2d');
+            const chartLabels = JSON.parse('{{ chart_labels|safe|default:"[]" }}');
+            const chartData = JSON.parse('{{ chart_data|safe|default:"[]" }}');
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'Notes Generated',
+                        data: chartData,
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    }
+                }
+            });
+
+            // Tags Logic
+            document.querySelectorAll('.tag-input').forEach(input => {
+                input.addEventListener('change', async () => {
+                    const materialId = input.getAttribute('data-id');
+                    try {
+                        await fetch(`/update_tags/${materialId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            },
+                            body: JSON.stringify({ tags: input.value })
+                        });
+                        // Optional: Show a brief success indicator
+                        input.classList.add('border-green-500');
+                        setTimeout(() => input.classList.remove('border-green-500'), 1000);
+                    } catch(e) {
+                        console.error('Error updating tags', e);
                     }
                 });
             });
