@@ -46,3 +46,26 @@ def generate_study_materials(transcript_text):
         return json.loads(response_content)
     except Exception as e:
         raise Exception(f"Failed to generate AI materials: {str(e)}")
+
+def chat_with_document(document_text, user_question):
+    """
+    Sends the document text and a user's question to Groq API.
+    """
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        raise ValueError("GROQ_API_KEY is not set in environment variables.")
+
+    client = Groq(api_key=api_key)
+    system_prompt = "You are a helpful AI assistant. Answer the user's question based ONLY on the provided document text. If the answer is not in the text, say 'I cannot find the answer in the document.'"
+    try:
+        completion = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Document Text:\n\n{document_text}\n\nQuestion: {user_question}"}
+            ],
+            temperature=0.5
+        )
+        return completion.choices[0].message.content
+    except Exception as e:
+        return f"Error: {str(e)}"
