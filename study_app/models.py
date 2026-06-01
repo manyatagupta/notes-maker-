@@ -22,6 +22,7 @@ class StudyMaterial(models.Model):
     flashcards = models.JSONField(default=list)
     mindmap = models.TextField(blank=True, null=True)
     is_favorite = models.BooleanField(default=False)
+    tags = models.CharField(max_length=255, blank=True, null=True)
     share_id = models.UUIDField(default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
 

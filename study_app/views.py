@@ -8,9 +8,12 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+from datetime import timedelta
+from django.db.models.functions import TruncDate
+from django.db.models import Count
 from .utils.youtube import extract_video_id, get_video_transcript
 from .utils.scraper import is_youtube_url, get_article_text
-from .utils.ai_processor import generate_study_materials
+from .utils.ai_processor import generate_study_materials, chat_with_document
 from .models import StudyMaterial, Profile
 from django.db.models import Q
 
@@ -74,6 +77,7 @@ def generate_materials(request):
                         'quiz': existing_material.quiz,
                         'flashcards': existing_material.flashcards,
                         'mindmap': existing_material.mindmap,
+                        'tags': existing_material.tags or '',
                         'video_id': video_id,
                         'title': existing_material.title,
                         'material_id': existing_material.id,
@@ -100,9 +104,11 @@ def generate_materials(request):
                 summary=materials.get('summary', ''),
                 quiz=materials.get('quiz', []),
                 flashcards=materials.get('flashcards', []),
-                mindmap=materials.get('mindmap', '')
+                mindmap=materials.get('mindmap', ''),
+                tags=''
             )
             materials['material_id'] = new_material.id
+            materials['tags'] = ''
             
             # 4. Include video ID for embedding
             if is_yt:
@@ -145,16 +151,30 @@ def dashboard(request):
     query = request.GET.get('q')
     if query:
         materials = materials.filter(
-            Q(title__icontains=query) | Q(summary__icontains=query)
+            Q(title__icontains=query) | Q(summary__icontains=query) | Q(tags__icontains=query)
         )
         
     # Order by favorite first, then date
     materials = materials.order_by('-is_favorite', '-created_at')
     
+    # Analytics data (last 7 days)
+    last_7_days = timezone.now() - timedelta(days=7)
+    analytics = StudyMaterial.objects.filter(user=request.user, created_at__gte=last_7_days) \
+        .annotate(date=TruncDate('created_at')) \
+        .values('date') \
+        .annotate(count=Count('id')) \
+        .order_by('date')
+        
+    dates = [(timezone.now().date() - timedelta(days=i)).strftime('%b %d') for i in range(6, -1, -1)]
+    counts_dict = {a['date'].strftime('%b %d'): a['count'] for a in analytics if a['date']}
+    chart_data = [counts_dict.get(d, 0) for d in dates]
+    
     return render(request, 'study_app/dashboard.html', {
         'materials': materials,
         'streak': streak,
-        'query': query or ''
+        'query': query or '',
+        'chart_labels': json.dumps(dates),
+        'chart_data': json.dumps(chart_data)
     })
 
 @csrf_exempt
@@ -165,6 +185,39 @@ def toggle_favorite(request, material_id):
         material.is_favorite = not material.is_favorite
         material.save()
         return JsonResponse({'is_favorite': material.is_favorite})
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+@csrf_exempt
+@login_required
+def update_tags(request, material_id):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            tags = data.get('tags', '')
+            material = get_object_or_404(StudyMaterial, id=material_id, user=request.user)
+            material.tags = tags
+            material.save()
+            return JsonResponse({'status': 'success', 'tags': material.tags})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+@csrf_exempt
+@login_required
+def document_chat(request, material_id):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            question = data.get('question', '')
+            material = get_object_or_404(StudyMaterial, id=material_id, user=request.user)
+            
+            # Combine notes and summary for context
+            context_text = f"Title: {material.title}\n\nSummary:\n{material.summary}\n\nNotes:\n{material.notes}"
+            
+            answer = chat_with_document(context_text, question)
+            return JsonResponse({'answer': answer})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
 @login_required
