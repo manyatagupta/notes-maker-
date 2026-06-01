@@ -86,6 +86,10 @@
                 StudyMaker AI
             </h1>
             <div class="flex gap-4 items-center">
+                <!-- Zen Mode Toggle Button -->
+                <button id="zen-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Zen Mode">
+                    🌙
+                </button>
                 <!-- Theme Toggle Button -->
                 <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5">
                     <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
@@ -199,7 +203,10 @@
                     
                     <!-- Notes Tab -->
                     <div id="notes-tab" class="tab-content active">
-                        <div class="flex justify-end mb-2">
+                        <div class="flex justify-end mb-2 gap-2">
+                            <button id="listen-notes-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1 rounded text-sm transition">
+                                🔊 Listen
+                            </button>
                             <button id="edit-notes-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1 rounded text-sm transition">
                                 ✏️ Edit Notes
                             </button>
@@ -210,12 +217,24 @@
                     </div>
 
                     <!-- Summary Tab -->
-                    <div id="summary-tab" class="tab-content prose max-w-none text-gray-700 text-lg leading-relaxed">
-                        <!-- Populated via JS -->
+                    <div id="summary-tab" class="tab-content">
+                        <div class="flex justify-end mb-2">
+                            <button id="listen-summary-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1 rounded text-sm transition">
+                                🔊 Listen
+                            </button>
+                        </div>
+                        <div id="summary-content" class="prose max-w-none text-gray-700 dark:text-gray-200 text-lg leading-relaxed">
+                            <!-- Populated via JS -->
+                        </div>
                     </div>
 
                     <!-- Flashcards Tab -->
                     <div id="flashcards-tab" class="tab-content">
+                        <div class="flex justify-end mb-4">
+                            <button id="export-csv-btn" class="hidden bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg items-center gap-2 text-sm shadow-sm transition">
+                                ⬇️ Download Anki CSV
+                            </button>
+                        </div>
                         <div id="flashcards-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Populated via JS -->
                         </div>
@@ -254,6 +273,23 @@
         </div>
     </div>
 
+    <!-- Ask AI Chat Widget -->
+    <div id="ask-ai-widget" class="fixed bottom-24 right-6 w-80 bg-white dark:bg-gray-800 shadow-xl rounded-xl border border-gray-200 dark:border-gray-700 z-40 hidden flex-col overflow-hidden">
+        <div class="bg-blue-600 text-white px-4 py-2 flex justify-between items-center cursor-pointer" id="ask-ai-header">
+            <span class="font-bold">🤖 Ask AI</span>
+            <button id="ask-ai-toggle" class="hover:text-gray-200 font-bold">&minus;</button>
+        </div>
+        <div id="ask-ai-body" class="flex flex-col h-64">
+            <div id="ask-ai-messages" class="flex-1 p-3 overflow-y-auto text-sm space-y-2 bg-gray-50 dark:bg-gray-900">
+                <div class="text-gray-500 italic">Ask anything about this document!</div>
+            </div>
+            <div class="p-2 border-t dark:border-gray-700 flex gap-1">
+                <input type="text" id="ask-ai-input" class="flex-1 px-2 py-1 border rounded text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Type your question...">
+                <button id="ask-ai-send" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">Send</button>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript Logic -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -266,7 +302,7 @@
             const videoPlayer = document.getElementById('video-player');
             
             const notesContent = document.getElementById('notes-content');
-            const summaryContent = document.getElementById('summary-tab');
+            const summaryContent = document.getElementById('summary-content');
             const flashcardsContainer = document.getElementById('flashcards-container');
             const quizContainer = document.getElementById('quiz-container');
             const mindmapContainer = document.getElementById('mindmap-container');
@@ -325,6 +361,25 @@
                         }
                     }
                 });
+
+            // Zen Mode Logic
+            const zenToggle = document.getElementById('zen-toggle');
+            zenToggle.addEventListener('click', () => {
+                document.body.classList.toggle('zen-mode');
+                const navbar = document.querySelector('nav');
+                const hero = document.querySelector('.text-center.mb-10');
+                if (document.body.classList.contains('zen-mode')) {
+                    navbar.style.display = 'none';
+                    if(hero) hero.style.display = 'none';
+                    document.main.classList.remove('max-w-5xl');
+                    document.main.classList.add('max-w-full');
+                } else {
+                    navbar.style.display = 'block';
+                    if(hero) hero.style.display = 'block';
+                    document.main.classList.add('max-w-5xl');
+                    document.main.classList.remove('max-w-full');
+                }
+            });
 
             // PDF Export Logic
             const exportPdfBtn = document.getElementById('export-pdf-btn');
@@ -397,10 +452,14 @@
                 });
             }
 
+            let currentMaterialId = null;
+            let currentFlashcards = [];
+
             function populateResults(data) {
                 // Update export links and share button
                 if (data.material_id) {
-                    document.getElementById('export-word').href = `/export/word/${data.material_id}/`;
+                    currentMaterialId = data.material_id;
+                    document.getElementById('export-word-btn').href = `/export/word/${data.material_id}/`;
                 }
                 
                 if (data.share_id) {
@@ -433,6 +492,10 @@
                 if (data.video_id) {
                     videoPlayer.src = `https://www.youtube.com/embed/${data.video_id}?autoplay=0`;
                 }
+                
+                // Show Chat Widget
+                document.getElementById('ask-ai-widget').classList.remove('hidden');
+                document.getElementById('ask-ai-widget').classList.add('flex');
 
                 // Notes
                 if (data.notes) {
@@ -470,6 +533,9 @@
 
                 // Flashcards
                 if (data.flashcards && Array.isArray(data.flashcards)) {
+                    currentFlashcards = data.flashcards;
+                    document.getElementById('export-csv-btn').classList.remove('hidden');
+                    document.getElementById('export-csv-btn').classList.add('flex');
                     flashcardsContainer.innerHTML = '';
                     data.flashcards.forEach((card, index) => {
                         const cardDiv = document.createElement('div');
@@ -552,6 +618,77 @@
                     try { mermaid.init(undefined, document.querySelectorAll('.mermaid')); } catch(e) { console.error("Mermaid error:", e); }
                 }
             }
+
+            // Export CSV Logic
+            document.getElementById('export-csv-btn').addEventListener('click', () => {
+                if (!currentFlashcards.length) return;
+                let csvContent = "data:text/csv;charset=utf-8,";
+                currentFlashcards.forEach(card => {
+                    const front = card.front.replace(/"/g, '""');
+                    const back = card.back.replace(/"/g, '""');
+                    csvContent += `"${front}","${back}"\r\n`;
+                });
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "flashcards_anki.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            // TTS Logic
+            let currentUtterance = null;
+            function speakText(text) {
+                if (currentUtterance) { window.speechSynthesis.cancel(); }
+                const cleanText = text.replace(/<[^>]+>/g, '').replace(/\[\d+:\d+(:\d+)?\]/g, '');
+                currentUtterance = new SpeechSynthesisUtterance(cleanText);
+                window.speechSynthesis.speak(currentUtterance);
+            }
+            document.getElementById('listen-notes-btn')?.addEventListener('click', () => speakText(notesContent.innerHTML));
+            document.getElementById('listen-summary-btn')?.addEventListener('click', () => speakText(summaryContent.innerHTML));
+
+            // Ask AI Chat Logic
+            const chatToggle = document.getElementById('ask-ai-toggle');
+            const chatBody = document.getElementById('ask-ai-body');
+            const chatInput = document.getElementById('ask-ai-input');
+            const chatSend = document.getElementById('ask-ai-send');
+            const chatMessages = document.getElementById('ask-ai-messages');
+
+            chatToggle.addEventListener('click', () => {
+                chatBody.classList.toggle('hidden');
+                chatToggle.innerHTML = chatBody.classList.contains('hidden') ? '+' : '&minus;';
+            });
+
+            chatSend.addEventListener('click', async () => {
+                const question = chatInput.value.trim();
+                if (!question || !currentMaterialId) return;
+                
+                chatInput.value = '';
+                chatMessages.innerHTML += `<div class="text-right text-blue-600 font-medium mb-1">${question}</div>`;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                try {
+                    const res = await fetch(`/document_chat/${currentMaterialId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        },
+                        body: JSON.stringify({ question })
+                    });
+                    const data = await res.json();
+                    if (data.answer) {
+                        chatMessages.innerHTML += `<div class="text-left text-gray-800 dark:text-gray-200 mb-2">${data.answer}</div>`;
+                    } else {
+                        chatMessages.innerHTML += `<div class="text-left text-red-500 mb-2">Error: ${data.error}</div>`;
+                    }
+                } catch (e) {
+                    chatMessages.innerHTML += `<div class="text-left text-red-500 mb-2">Error connecting to AI.</div>`;
+                }
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+            chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') chatSend.click(); });
 
             // Edit Notes Logic
             const editBtn = document.getElementById('edit-notes-btn');
