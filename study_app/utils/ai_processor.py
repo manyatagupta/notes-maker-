@@ -69,3 +69,26 @@ def chat_with_document(document_text, user_question):
         return completion.choices[0].message.content
     except Exception as e:
         return f"Error: {str(e)}"
+
+def translate_document(document_text, target_language):
+    """
+    Translates the document text into the specified target language using Groq API.
+    """
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        raise ValueError("GROQ_API_KEY is not set in environment variables.")
+
+    client = Groq(api_key=api_key)
+    system_prompt = f"You are an expert translator. Translate the following study materials into {target_language}. Maintain the original formatting, including bullet points, bold text, and timestamps. Do not add any extra commentary."
+    try:
+        completion = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Text to translate:\n\n{document_text}"}
+            ],
+            temperature=0.3
+        )
+        return completion.choices[0].message.content
+    except Exception as e:
+        return f"Error translating text: {str(e)}"
