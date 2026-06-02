@@ -161,8 +161,19 @@
         <!-- Results Section (Initially Hidden) -->
         <div id="results-container" class="hidden opacity-0 transition-opacity duration-500">
             
-            <!-- PDF & Word Export Buttons -->
-            <div class="flex justify-end gap-3 mb-4 no-print">
+            <!-- Export & Social Share Buttons -->
+            <div class="flex justify-end gap-3 mb-4 no-print flex-wrap items-center">
+                <div id="social-share-container" class="hidden flex gap-2">
+                    <a id="share-whatsapp-btn" href="#" target="_blank" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg shadow-sm transition" title="Share on WhatsApp">
+                        📱 WhatsApp
+                    </a>
+                    <a id="share-twitter-btn" href="#" target="_blank" class="bg-black hover:bg-gray-800 text-white p-2 rounded-lg shadow-sm transition" title="Share on X / Twitter">
+                        🐦 Twitter
+                    </a>
+                </div>
+                <button id="share-link-btn" class="hidden bg-purple-600 hover:bg-purple-700 text-white font-medium px-4 py-2 rounded-lg flex items-center gap-2 text-sm shadow-sm transition">
+                    🔗 Copy Link
+                </button>
                 <a id="export-word-btn" href="#" class="hidden bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg items-center gap-2 text-sm shadow-sm transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     Save as Word
@@ -203,13 +214,27 @@
                     
                     <!-- Notes Tab -->
                     <div id="notes-tab" class="tab-content active">
-                        <div class="flex justify-end mb-2 gap-2">
-                            <button id="listen-notes-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1 rounded text-sm transition">
-                                🔊 Listen
-                            </button>
-                            <button id="edit-notes-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1 rounded text-sm transition">
-                                ✏️ Edit Notes
-                            </button>
+                        <div class="flex flex-wrap justify-between mb-4 gap-2 border-b border-gray-100 dark:border-gray-700 pb-2">
+                            <div class="flex gap-2 items-center">
+                                <select id="translate-lang" class="bg-white border border-gray-300 text-gray-900 text-sm rounded focus:ring-blue-500 focus:border-blue-500 p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                    <option value="Spanish">Spanish</option>
+                                    <option value="French">French</option>
+                                    <option value="Hindi">Hindi</option>
+                                    <option value="German">German</option>
+                                    <option value="Japanese">Japanese</option>
+                                </select>
+                                <button id="translate-notes-btn" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300 px-3 py-1.5 rounded text-sm font-medium transition">
+                                    🌍 Translate
+                                </button>
+                            </div>
+                            <div class="flex gap-2">
+                                <button id="listen-notes-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition">
+                                    🔊 Listen
+                                </button>
+                                <button id="edit-notes-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition">
+                                    ✏️ Edit Notes
+                                </button>
+                            </div>
                         </div>
                         <div id="notes-content" class="prose max-w-none text-gray-700 leading-relaxed outline-none p-2 rounded focus:ring-2 focus:ring-blue-200">
                             <!-- Populated via JS -->
@@ -283,11 +308,21 @@
             <div id="ask-ai-messages" class="flex-1 p-3 overflow-y-auto text-sm space-y-2 bg-gray-50 dark:bg-gray-900">
                 <div class="text-gray-500 italic">Ask anything about this document!</div>
             </div>
-            <div class="p-2 border-t dark:border-gray-700 flex gap-1">
-                <input type="text" id="ask-ai-input" class="flex-1 px-2 py-1 border rounded text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Type your question...">
-                <button id="ask-ai-send" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">Send</button>
+            <div class="p-2 border-t dark:border-gray-700 flex gap-1 items-center">
+                <button id="ask-ai-voice" class="text-gray-500 hover:text-blue-500 transition-colors p-1" title="Use Voice Input">🎤</button>
+                <input type="text" id="ask-ai-input" class="flex-1 px-2 py-1.5 border rounded text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white outline-none" placeholder="Type your question...">
+                <button id="ask-ai-send" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm font-medium">Send</button>
             </div>
         </div>
+    </div>
+
+    <!-- Dictionary Popup -->
+    <div id="dict-popup" class="fixed z-50 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 p-4 w-64 hidden transition-opacity">
+        <div class="flex justify-between items-start mb-2">
+            <h4 id="dict-word" class="font-bold text-lg text-blue-600 capitalize">Word</h4>
+            <button id="dict-close" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-xl leading-none">&times;</button>
+        </div>
+        <p id="dict-def" class="text-sm text-gray-700 dark:text-gray-300">Loading definition...</p>
     </div>
 
     <!-- JavaScript Logic -->
@@ -463,17 +498,24 @@
                 }
                 
                 if (data.share_id) {
+                    const shareUrl = `${window.location.origin}/shared/${data.share_id}/`;
                     const shareBtn = document.getElementById('share-link-btn');
                     if (shareBtn) {
+                        shareBtn.classList.remove('hidden');
                         shareBtn.setAttribute('data-share-id', data.share_id);
                         shareBtn.onclick = () => {
-                            const shareUrl = `${window.location.origin}/shared/${data.share_id}/`;
                             navigator.clipboard.writeText(shareUrl).then(() => {
                                 const originalText = shareBtn.textContent;
                                 shareBtn.textContent = 'Copied!';
                                 setTimeout(() => shareBtn.textContent = originalText, 2000);
                             });
                         };
+                    }
+                    const socialContainer = document.getElementById('social-share-container');
+                    if (socialContainer) {
+                        socialContainer.classList.remove('hidden');
+                        document.getElementById('share-whatsapp-btn').href = `https://wa.me/?text=Check out these awesome study notes: ${encodeURIComponent(shareUrl)}`;
+                        document.getElementById('share-twitter-btn').href = `https://twitter.com/intent/tweet?text=Check out my AI generated study notes!&url=${encodeURIComponent(shareUrl)}`;
                     }
                 }
 
@@ -749,6 +791,114 @@
             closeBtn.onclick = () => {
                 widget.style.display = 'none';
             };
+
+            // ---------------- NEW FEATURES BATCH 3 ----------------
+
+            // 1. Translation Logic
+            const translateNotesBtn = document.getElementById('translate-notes-btn');
+            const translateLang = document.getElementById('translate-lang');
+            if (translateNotesBtn) {
+                translateNotesBtn.addEventListener('click', async () => {
+                    if (!currentMaterialId) return;
+                    const lang = translateLang.value;
+                    const originalText = translateNotesBtn.innerHTML;
+                    translateNotesBtn.innerHTML = '⏳ Translating...';
+                    translateNotesBtn.disabled = true;
+                    try {
+                        const res = await fetch(`/translate_content/${currentMaterialId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                            },
+                            body: JSON.stringify({ language: lang, type: 'notes' })
+                        });
+                        const data = await res.json();
+                        if (data.translated_text) {
+                            notesContent.innerHTML = data.translated_text.replace(/\n/g, '<br>');
+                        } else {
+                            alert("Translation failed: " + data.error);
+                        }
+                    } catch (e) {
+                        alert("Error connecting to translation service.");
+                    } finally {
+                        translateNotesBtn.innerHTML = originalText;
+                        translateNotesBtn.disabled = false;
+                    }
+                });
+            }
+
+            // 2. Dictionary Popup Logic
+            const dictPopup = document.getElementById('dict-popup');
+            const dictWord = document.getElementById('dict-word');
+            const dictDef = document.getElementById('dict-def');
+            document.getElementById('dict-close').onclick = () => dictPopup.classList.add('hidden');
+            
+            document.addEventListener('dblclick', async (e) => {
+                if (!e.target.closest('#notes-content') && !e.target.closest('#summary-content')) return;
+                
+                const selection = window.getSelection().toString().trim();
+                if (selection && selection.length > 1 && !selection.includes(' ')) {
+                    const cleanWord = selection.replace(/[^a-zA-Z-]/g, '');
+                    if (cleanWord) {
+                        dictPopup.classList.remove('hidden');
+                        dictWord.textContent = cleanWord;
+                        dictDef.textContent = "Loading definition...";
+                        
+                        dictPopup.style.left = Math.min(e.pageX + 10, window.innerWidth - 280) + 'px';
+                        dictPopup.style.top = e.pageY + 10 + 'px';
+
+                        try {
+                            const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${cleanWord}`);
+                            if (!res.ok) throw new Error();
+                            const data = await res.json();
+                            const definition = data[0].meanings[0].definitions[0].definition;
+                            dictDef.textContent = definition;
+                        } catch (err) {
+                            dictDef.textContent = "No definition found.";
+                        }
+                    }
+                }
+            });
+
+            // 3. Voice Input for Ask AI
+            const voiceBtn = document.getElementById('ask-ai-voice');
+            if (voiceBtn && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.lang = 'en-US';
+
+                recognition.onstart = function() {
+                    voiceBtn.classList.add('text-red-500', 'animate-pulse');
+                    voiceBtn.classList.remove('text-gray-500');
+                    chatInput.placeholder = "Listening...";
+                };
+
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    chatInput.value = transcript;
+                    chatSend.click();
+                };
+
+                recognition.onerror = function(event) {
+                    console.error("Speech recognition error", event.error);
+                };
+
+                recognition.onend = function() {
+                    voiceBtn.classList.remove('text-red-500', 'animate-pulse');
+                    voiceBtn.classList.add('text-gray-500');
+                    chatInput.placeholder = "Type your question...";
+                };
+
+                voiceBtn.addEventListener('click', () => {
+                    recognition.start();
+                });
+            } else if (voiceBtn) {
+                voiceBtn.title = "Voice input not supported in this browser.";
+                voiceBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+
         });
     </script>
 </body>

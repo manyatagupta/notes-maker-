@@ -13,7 +13,7 @@ from django.db.models.functions import TruncDate
 from django.db.models import Count
 from .utils.youtube import extract_video_id, get_video_transcript
 from .utils.scraper import is_youtube_url, get_article_text
-from .utils.ai_processor import generate_study_materials, chat_with_document
+from .utils.ai_processor import generate_study_materials, chat_with_document, translate_document
 from .models import StudyMaterial, Profile
 from django.db.models import Q
 
@@ -157,6 +157,14 @@ def dashboard(request):
     # Order by favorite first, then date
     materials = materials.order_by('-is_favorite', '-created_at')
     
+    # Spaced Repetition Logic (Due for Review)
+    today = timezone.now().date()
+    due_dates = [today - timedelta(days=1), today - timedelta(days=3), today - timedelta(days=7)]
+    due_for_review = materials.filter(
+        created_at__date__in=due_dates, 
+        is_mastered=False
+    ).order_by('-created_at')
+    
     # Analytics data (last 7 days)
     last_7_days = timezone.now() - timedelta(days=7)
     analytics = StudyMaterial.objects.filter(user=request.user, created_at__gte=last_7_days) \
@@ -171,6 +179,7 @@ def dashboard(request):
     
     return render(request, 'study_app/dashboard.html', {
         'materials': materials,
+        'due_for_review': due_for_review,
         'streak': streak,
         'query': query or '',
         'chart_labels': json.dumps(dates),
@@ -185,6 +194,16 @@ def toggle_favorite(request, material_id):
         material.is_favorite = not material.is_favorite
         material.save()
         return JsonResponse({'is_favorite': material.is_favorite})
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+@csrf_exempt
+@login_required
+def toggle_mastered(request, material_id):
+    if request.method == 'POST':
+        material = get_object_or_404(StudyMaterial, id=material_id, user=request.user)
+        material.is_mastered = not material.is_mastered
+        material.save()
+        return JsonResponse({'is_mastered': material.is_mastered})
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
 @csrf_exempt
@@ -216,6 +235,24 @@ def document_chat(request, material_id):
             
             answer = chat_with_document(context_text, question)
             return JsonResponse({'answer': answer})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+@csrf_exempt
+@login_required
+def translate_content(request, material_id):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            target_language = data.get('language', 'Spanish')
+            text_type = data.get('type', 'notes') # 'notes' or 'summary'
+            
+            material = get_object_or_404(StudyMaterial, id=material_id, user=request.user)
+            text_to_translate = material.notes if text_type == 'notes' else material.summary
+            
+            translated_text = translate_document(text_to_translate, target_language)
+            return JsonResponse({'translated_text': translated_text})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'error': 'Invalid request method.'}, status=405)

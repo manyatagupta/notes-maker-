@@ -12,6 +12,8 @@ urlpatterns = [
     path('export/word/<int:material_id>/', views.export_word, name='export_word'),
     path('shared/<uuid:share_id>/', views.shared_material, name='shared_material'),
     path('toggle_favorite/<int:material_id>/', views.toggle_favorite, name='toggle_favorite'),
+    path('toggle_mastered/<int:material_id>/', views.toggle_mastered, name='toggle_mastered'),
     path('update_tags/<int:material_id>/', views.update_tags, name='update_tags'),
     path('document_chat/<int:material_id>/', views.document_chat, name='document_chat'),
+    path('translate_content/<int:material_id>/', views.translate_content, name='translate_content'),
 ]

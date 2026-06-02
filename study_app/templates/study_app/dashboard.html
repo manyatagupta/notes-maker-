@@ -55,6 +55,25 @@
                 <canvas id="activityChart"></canvas>
             </div>
         </div>
+
+        {% if due_for_review %}
+        <!-- Spaced Repetition Reminders -->
+        <div class="mb-10 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 rounded-xl p-6">
+            <h3 class="text-xl font-bold text-blue-800 dark:text-blue-300 mb-4 flex items-center gap-2">
+                📅 Due for Review Today
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for mat in due_for_review %}
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border-l-4 border-blue-500">
+                    <h4 class="font-bold text-gray-800 dark:text-white truncate" title="{{ mat.title }}">{{ mat.title }}</h4>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Generated on: {{ mat.created_at|date:"M d, Y" }}</p>
+                    <a href="{% url 'index' %}?video_id={{ mat.video_id }}" class="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline">Review Now &rarr;</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
             <h2 class="text-3xl font-bold text-gray-800 dark:text-white">Your Saved Notes</h2>
             <form method="get" action="{% url 'dashboard' %}" class="flex gap-2 w-full sm:w-auto">
@@ -69,9 +88,14 @@
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 hover:shadow-lg transition">
                 <div class="flex justify-between items-start mb-2">
                     <h3 class="font-bold text-lg text-gray-800 dark:text-white truncate pr-2" title="{{ mat.title }}">{{ mat.title }}</h3>
-                    <button class="favorite-btn text-2xl focus:outline-none hover:scale-110 transition-transform" data-id="{{ mat.id }}">
-                        {% if mat.is_favorite %}⭐{% else %}☆{% endif %}
-                    </button>
+                    <div class="flex gap-2 items-center">
+                        <button class="mastered-btn text-xl focus:outline-none hover:scale-110 transition-transform" data-id="{{ mat.id }}" title="Mark as Mastered">
+                            {% if mat.is_mastered %}✅{% else %}⚪{% endif %}
+                        </button>
+                        <button class="favorite-btn text-2xl focus:outline-none hover:scale-110 transition-transform" data-id="{{ mat.id }}" title="Toggle Favorite">
+                            {% if mat.is_favorite %}⭐{% else %}☆{% endif %}
+                        </button>
+                    </div>
                 </div>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">{{ mat.created_at|date:"M d, Y" }}</p>
                 <div class="mb-4">
@@ -136,6 +160,29 @@
                         }
                     } catch(e) {
                         console.error('Error toggling favorite', e);
+                    }
+                });
+            });
+
+            // Mastered Toggle Logic
+            document.querySelectorAll('.mastered-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const materialId = btn.getAttribute('data-id');
+                    try {
+                        const res = await fetch(`/toggle_mastered/${materialId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            }
+                        });
+                        const data = await res.json();
+                        if (data.is_mastered) {
+                            btn.textContent = '✅';
+                        } else {
+                            btn.textContent = '⚪';
+                        }
+                    } catch(e) {
+                        console.error('Error toggling mastered', e);
                     }
                 });
             });
