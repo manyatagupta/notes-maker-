@@ -92,3 +92,26 @@ def translate_document(document_text, target_language):
         return completion.choices[0].message.content
     except Exception as e:
         return f"Error translating text: {str(e)}"
+
+def eli5_document(document_text):
+    """
+    Simplifies the document text to an 'Explain Like I'm 5' (ELI5) level using Groq API.
+    """
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        raise ValueError("GROQ_API_KEY is not set in environment variables.")
+
+    client = Groq(api_key=api_key)
+    system_prompt = "You are an expert teacher who specializes in making complex topics extremely simple. Rewrite the following text so that a 5-year-old could easily understand it. Use fun analogies and very simple words. Maintain bullet points if they exist."
+    try:
+        completion = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Text to simplify:\n\n{document_text}"}
+            ],
+            temperature=0.7
+        )
+        return completion.choices[0].message.content
+    except Exception as e:
+        return f"Error generating ELI5 text: {str(e)}"
