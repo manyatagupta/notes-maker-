@@ -16,4 +16,5 @@ urlpatterns = [
     path('update_tags/<int:material_id>/', views.update_tags, name='update_tags'),
     path('document_chat/<int:material_id>/', views.document_chat, name='document_chat'),
     path('translate_content/<int:material_id>/', views.translate_content, name='translate_content'),
+    path('eli5_content/<int:material_id>/', views.eli5_content, name='eli5_content'),
 ]

@@ -48,6 +48,19 @@
     <!-- Content -->
     <div class="max-w-5xl mx-auto px-4 py-8">
         
+        <!-- Dashboard Header & Goals -->
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-3xl font-bold text-gray-800 dark:text-white">Your Dashboard</h2>
+            <div class="bg-blue-50 dark:bg-blue-900/30 px-4 py-2 rounded-lg border border-blue-100 dark:border-blue-800 flex items-center gap-3">
+                <span class="text-sm font-semibold text-blue-800 dark:text-blue-300">🎯 Weekly Goal:</span>
+                <div class="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                    {% widthratio notes_generated_this_week weekly_goal 100 as progress_percent %}
+                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: {% if progress_percent > '100' %}100{% else %}{{ progress_percent }}{% endif %}%"></div>
+                </div>
+                <span class="text-sm font-bold text-blue-800 dark:text-blue-300">{{ notes_generated_this_week }} / {{ weekly_goal }}</span>
+            </div>
+        </div>
+
         <!-- Analytics Chart -->
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8 border border-gray-100 dark:border-gray-700">
             <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Study Activity (Last 7 Days)</h3>

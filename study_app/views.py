@@ -13,7 +13,7 @@ from django.db.models.functions import TruncDate
 from django.db.models import Count
 from .utils.youtube import extract_video_id, get_video_transcript
 from .utils.scraper import is_youtube_url, get_article_text
-from .utils.ai_processor import generate_study_materials, chat_with_document, translate_document
+from .utils.ai_processor import generate_study_materials, chat_with_document, translate_document, eli5_document
 from .models import StudyMaterial, Profile
 from django.db.models import Q
 
@@ -168,14 +168,18 @@ def dashboard(request):
     # Analytics data (last 7 days)
     last_7_days = timezone.now() - timedelta(days=7)
     analytics = StudyMaterial.objects.filter(user=request.user, created_at__gte=last_7_days) \
-        .annotate(date=TruncDate('created_at')) \
-        .values('date') \
-        .annotate(count=Count('id')) \
-        .order_by('date')
-        
-    dates = [(timezone.now().date() - timedelta(days=i)).strftime('%b %d') for i in range(6, -1, -1)]
-    counts_dict = {a['date'].strftime('%b %d'): a['count'] for a in analytics if a['date']}
-    chart_data = [counts_dict.get(d, 0) for d in dates]
+                                     .annotate(date=TruncDate('created_at')) \
+                                     .values('date') \
+                                     .annotate(count=Count('id')) \
+                                     .order_by('date')
+    
+    dates = [(timezone.now().date() - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(6, -1, -1)]
+    counts_by_date = {item['date'].strftime('%Y-%m-%d'): item['count'] for item in analytics}
+    chart_data = [counts_by_date.get(d, 0) for d in dates]
+    
+    # Feature 6: Weekly Study Goal
+    notes_generated_this_week = sum(chart_data)
+    weekly_goal = 5 # Default goal
     
     return render(request, 'study_app/dashboard.html', {
         'materials': materials,
@@ -183,7 +187,9 @@ def dashboard(request):
         'streak': streak,
         'query': query or '',
         'chart_labels': json.dumps(dates),
-        'chart_data': json.dumps(chart_data)
+        'chart_data': json.dumps(chart_data),
+        'notes_generated_this_week': notes_generated_this_week,
+        'weekly_goal': weekly_goal
     })
 
 @csrf_exempt
@@ -253,6 +259,23 @@ def translate_content(request, material_id):
             
             translated_text = translate_document(text_to_translate, target_language)
             return JsonResponse({'translated_text': translated_text})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+@csrf_exempt
+@login_required
+def eli5_content(request, material_id):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            text_type = data.get('type', 'notes')
+            
+            material = get_object_or_404(StudyMaterial, id=material_id, user=request.user)
+            text_to_simplify = material.notes if text_type == 'notes' else material.summary
+            
+            eli5_text = eli5_document(text_to_simplify)
+            return JsonResponse({'eli5_text': eli5_text})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
