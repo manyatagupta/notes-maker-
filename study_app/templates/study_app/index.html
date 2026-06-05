@@ -242,6 +242,9 @@
                                 <button id="eli5-notes-btn" class="bg-pink-100 hover:bg-pink-200 text-pink-700 dark:bg-pink-900 dark:text-pink-300 px-3 py-1.5 rounded text-sm font-medium transition ml-2">
                                     🧒 ELI5
                                 </button>
+                                <button id="bionic-btn" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300 px-3 py-1.5 rounded text-sm font-medium transition ml-2" title="Bionic Reading Mode">
+                                    👁️ Bionic
+                                </button>
                             </div>
                             <div class="flex gap-2">
                                 <button id="listen-notes-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition">
@@ -581,6 +584,55 @@
             });
 
             
+            
+            // Feature 1: Bionic Reading
+            const bionicBtn = document.getElementById('bionic-btn');
+            let isBionic = false;
+            let originalNotesHtml = '';
+            
+            function applyBionic(html) {
+                const div = document.createElement('div');
+                div.innerHTML = html;
+                function processNode(node) {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        const words = node.textContent.split(/(\s+)/);
+                        const span = document.createElement('span');
+                        words.forEach(word => {
+                            if (word.trim().length > 0) {
+                                const mid = Math.ceil(word.length / 2);
+                                const b = document.createElement('b');
+                                b.textContent = word.slice(0, mid);
+                                const rest = document.createTextNode(word.slice(mid));
+                                span.appendChild(b);
+                                span.appendChild(rest);
+                            } else {
+                                span.appendChild(document.createTextNode(word));
+                            }
+                        });
+                        node.parentNode.replaceChild(span, node);
+                    } else if (node.nodeType === Node.ELEMENT_NODE) {
+                        Array.from(node.childNodes).forEach(processNode);
+                    }
+                }
+                Array.from(div.childNodes).forEach(processNode);
+                return div.innerHTML;
+            }
+
+            if (bionicBtn && notesContent) {
+                bionicBtn.addEventListener('click', () => {
+                    if (!originalNotesHtml) originalNotesHtml = notesContent.innerHTML;
+                    if (!isBionic) {
+                        notesContent.innerHTML = applyBionic(originalNotesHtml);
+                        bionicBtn.classList.add('bg-indigo-300', 'dark:bg-indigo-700');
+                        isBionic = true;
+                    } else {
+                        notesContent.innerHTML = originalNotesHtml;
+                        bionicBtn.classList.remove('bg-indigo-300', 'dark:bg-indigo-700');
+                        isBionic = false;
+                    }
+                });
+            }
+
             // Feature 5: Reading Progress Bar
             window.addEventListener('scroll', () => {
                 const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
