@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - StudyMaker AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -200,6 +201,7 @@
                         const data = await res.json();
                         if (data.is_mastered) {
                             btn.textContent = '✅';
+                            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
                         } else {
                             btn.textContent = '⚪';
                         }
