@@ -274,6 +274,9 @@
                                 <button id="edit-notes-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition">
                                     ✏️ Edit Notes
                                 </button>
+                                <button id="copy-notes-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
+                                    📋 Copy
+                                </button>
                                 <button id="autoscroll-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
                                     📜 Auto-Scroll
                                 </button>
@@ -800,6 +803,18 @@
                     swSeconds = 0;
                     updateSwDisplay();
                     swToggle.textContent = '▶️';
+                });
+            }
+
+            
+            // Feature 5: Quick Copy
+            const copyNotesBtn = document.getElementById('copy-notes-btn');
+            if(copyNotesBtn) {
+                copyNotesBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(notesContent?.innerText || "");
+                    const oldText = copyNotesBtn.innerHTML;
+                    copyNotesBtn.innerHTML = "✅ Copied!";
+                    setTimeout(() => copyNotesBtn.innerHTML = oldText, 2000);
                 });
             }
 
