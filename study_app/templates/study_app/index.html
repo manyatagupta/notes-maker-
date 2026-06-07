@@ -112,6 +112,10 @@
                 <button id="fullscreen-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Fullscreen Mode">
                     ⛶
                 </button>
+                <!-- Sepia Toggle Button -->
+                <button id="sepia-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Blue Light Filter">
+                    ☕
+                </button>
                 <!-- Theme Toggle Button -->
                 <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5">
                     <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
@@ -465,6 +469,23 @@
                         });
                     } else {
                         document.exitFullscreen();
+                    }
+                });
+            }
+
+                
+            // Feature 2: Blue Light Filter (Sepia)
+            const sepiaToggle = document.getElementById('sepia-toggle');
+            let isSepia = false;
+            if (sepiaToggle) {
+                sepiaToggle.addEventListener('click', () => {
+                    isSepia = !isSepia;
+                    if (isSepia) {
+                        document.body.style.filter = 'sepia(0.5) hue-rotate(-30deg)';
+                        sepiaToggle.classList.add('bg-orange-100', 'dark:bg-orange-900');
+                    } else {
+                        document.body.style.filter = '';
+                        sepiaToggle.classList.remove('bg-orange-100', 'dark:bg-orange-900');
                     }
                 });
             }
