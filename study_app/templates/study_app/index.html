@@ -116,6 +116,10 @@
                 <button id="sepia-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Blue Light Filter">
                     ☕
                 </button>
+                <!-- High Contrast Toggle Button -->
+                <button id="contrast-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="High Contrast Mode">
+                    🌗
+                </button>
                 <!-- Theme Toggle Button -->
                 <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5">
                     <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
@@ -490,6 +494,23 @@
                     } else {
                         document.body.style.filter = '';
                         sepiaToggle.classList.remove('bg-orange-100', 'dark:bg-orange-900');
+                    }
+                });
+            }
+
+                
+            // Feature 4: High Contrast Mode
+            const contrastToggle = document.getElementById('contrast-toggle');
+            let isHighContrast = false;
+            if (contrastToggle) {
+                contrastToggle.addEventListener('click', () => {
+                    isHighContrast = !isHighContrast;
+                    if (isHighContrast) {
+                        document.documentElement.style.filter = 'contrast(1.5) grayscale(1)';
+                        contrastToggle.classList.add('bg-gray-300', 'dark:bg-gray-600');
+                    } else {
+                        document.documentElement.style.filter = '';
+                        contrastToggle.classList.remove('bg-gray-300', 'dark:bg-gray-600');
                     }
                 });
             }
