@@ -335,6 +335,9 @@
                             <button id="print-flashcards-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg items-center gap-2 text-sm shadow-sm transition ml-2 hidden">
                                 🖨️ Print Flashcards
                             </button>
+                            <button id="shuffle-flashcards-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg items-center gap-2 text-sm shadow-sm transition ml-2 hidden">
+                                🔀 Shuffle Cards
+                            </button>
                         </div>
                         <div id="flashcards-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Populated via JS -->
@@ -1156,6 +1159,19 @@
                     mark.className = 'bg-yellow-300 dark:bg-yellow-600';
                     range.surroundContents(mark);
                     selection.removeAllRanges();
+                });
+            }
+
+            
+            // Feature 2: Flashcard Shuffle
+            const shuffleBtn = document.getElementById('shuffle-flashcards-btn');
+            if(shuffleBtn) {
+                shuffleBtn.addEventListener('click', () => {
+                    const container = document.getElementById('flashcards-container');
+                    if(!container) return;
+                    const cards = Array.from(container.children);
+                    cards.sort(() => Math.random() - 0.5);
+                    cards.forEach(card => container.appendChild(card));
                 });
             }
 
