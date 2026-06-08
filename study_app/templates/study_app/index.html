@@ -306,6 +306,9 @@
                                 <button id="focus-mask-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
                                     🔦 Focus Mask
                                 </button>
+                                <button id="hide-img-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2" title="Toggle Images">
+                                    🖼️ Hide Images
+                                </button>
                             </div>
                         </div>
                         <div id="notes-content" class="prose max-w-none text-gray-700 leading-relaxed outline-none p-2 rounded focus:ring-2 focus:ring-blue-200">
@@ -1173,6 +1176,29 @@
                     const cards = Array.from(container.children);
                     cards.sort(() => Math.random() - 0.5);
                     cards.forEach(card => container.appendChild(card));
+                });
+            }
+
+            
+            // Feature 4: Hide Images
+            const hideImgBtn = document.getElementById('hide-img-btn');
+            let imagesHidden = false;
+            if(hideImgBtn) {
+                hideImgBtn.addEventListener('click', () => {
+                    imagesHidden = !imagesHidden;
+                    const styleId = 'hide-img-style';
+                    if(imagesHidden) {
+                        const style = document.createElement('style');
+                        style.id = styleId;
+                        style.innerHTML = '#notes-content img, #summary-content img { display: none !important; }';
+                        document.head.appendChild(style);
+                        hideImgBtn.textContent = '🖼️ Show Images';
+                        hideImgBtn.classList.add('bg-blue-200', 'dark:bg-blue-800');
+                    } else {
+                        document.getElementById(styleId)?.remove();
+                        hideImgBtn.textContent = '🖼️ Hide Images';
+                        hideImgBtn.classList.remove('bg-blue-200', 'dark:bg-blue-800');
+                    }
                 });
             }
 
