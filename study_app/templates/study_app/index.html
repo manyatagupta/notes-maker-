@@ -1202,6 +1202,18 @@
                 });
             }
 
+            
+            // Feature 5: Read Tracker
+            const addReadBtn = document.getElementById('add-read-btn');
+            const readCountSpan = document.getElementById('read-count');
+            let readCount = 0;
+            if(addReadBtn && readCountSpan) {
+                addReadBtn.addEventListener('click', () => {
+                    readCount++;
+                    readCountSpan.textContent = readCount;
+                });
+            }
+
             // Feature 3: Keyboard Shortcuts
             document.addEventListener('keydown', (e) => {
                 // Esc to close widgets
