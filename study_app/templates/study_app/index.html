@@ -120,6 +120,10 @@
                 <button id="contrast-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="High Contrast Mode">
                     🌗
                 </button>
+                <!-- 20-20-20 Timer Toggle Button -->
+                <button id="eye-timer-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="20-20-20 Eye Strain Timer">
+                    👁️
+                </button>
                 <!-- Theme Toggle Button -->
                 <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5">
                     <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
@@ -535,6 +539,26 @@
                     } else {
                         document.documentElement.style.filter = '';
                         contrastToggle.classList.remove('bg-gray-300', 'dark:bg-gray-600');
+                    }
+                });
+            }
+
+                
+            // Feature 6: 20-20-20 Timer
+            const eyeTimerToggle = document.getElementById('eye-timer-toggle');
+            let eyeTimerInterval;
+            let isEyeTimerActive = false;
+            if(eyeTimerToggle) {
+                eyeTimerToggle.addEventListener('click', () => {
+                    isEyeTimerActive = !isEyeTimerActive;
+                    if(isEyeTimerActive) {
+                        eyeTimerToggle.classList.add('bg-green-100', 'dark:bg-green-900');
+                        eyeTimerInterval = setInterval(() => {
+                            alert("👁️ 20-20-20 Rule! Look at something 20 feet away for 20 seconds to rest your eyes.");
+                        }, 20 * 60 * 1000); // 20 minutes
+                    } else {
+                        eyeTimerToggle.classList.remove('bg-green-100', 'dark:bg-green-900');
+                        clearInterval(eyeTimerInterval);
                     }
                 });
             }
