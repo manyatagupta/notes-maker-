@@ -318,6 +318,9 @@
                                 <button id="hide-img-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2" title="Toggle Images">
                                     🖼️ Hide Images
                                 </button>
+                                <button id="doc-stats-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2" title="Document Stats">
+                                    📊 Stats
+                                </button>
                             </div>
                         </div>
                         
@@ -1235,6 +1238,19 @@
             }
 
             
+            
+            // Feature 3: Document Stats Tracker
+            const docStatsBtn = document.getElementById('doc-stats-btn');
+            if(docStatsBtn) {
+                docStatsBtn.addEventListener('click', () => {
+                    const text = notesContent?.innerText || "";
+                    const words = text.trim().split(/\s+/).length;
+                    const chars = text.length;
+                    const paras = text.split(/\n\n+/).length;
+                    alert(`Document Stats:\n\nWords: ${words}\nCharacters: ${chars}\nParagraphs: ${paras}`);
+                });
+            }
+
             // Feature 4: Hide Images
             const hideImgBtn = document.getElementById('hide-img-btn');
             let imagesHidden = false;
