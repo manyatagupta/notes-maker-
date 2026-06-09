@@ -124,6 +124,11 @@
                 <button id="eye-timer-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="20-20-20 Eye Strain Timer">
                     👁️
                 </button>
+                <!-- Ambient Rain Sounds -->
+                <button id="rain-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Ambient Rain Sounds">
+                    🌧️
+                </button>
+                <audio id="rain-audio" loop src="https://cdn.freesound.org/previews/346/346618_6002932-lq.mp3"></audio>
                 <!-- Theme Toggle Button -->
                 <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5">
                     <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
@@ -544,6 +549,25 @@
             }
 
                 
+            
+            // Feature 1: Ambient Rain Sounds
+            const rainToggle = document.getElementById('rain-toggle');
+            const rainAudio = document.getElementById('rain-audio');
+            let isRainPlaying = false;
+            if(rainToggle && rainAudio) {
+                rainAudio.volume = 0.3;
+                rainToggle.addEventListener('click', () => {
+                    isRainPlaying = !isRainPlaying;
+                    if(isRainPlaying) {
+                        rainAudio.play().catch(e => console.log('Audio play failed', e));
+                        rainToggle.classList.add('bg-blue-100', 'dark:bg-blue-900');
+                    } else {
+                        rainAudio.pause();
+                        rainToggle.classList.remove('bg-blue-100', 'dark:bg-blue-900');
+                    }
+                });
+            }
+
             // Feature 6: 20-20-20 Timer
             const eyeTimerToggle = document.getElementById('eye-timer-toggle');
             let eyeTimerInterval;
