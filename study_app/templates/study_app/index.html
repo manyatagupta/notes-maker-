@@ -128,6 +128,10 @@
                 <button id="rain-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Ambient Rain Sounds">
                     🌧️
                 </button>
+                <!-- Hydration Reminder Toggle Button -->
+                <button id="water-timer-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Hydration Reminder">
+                    💧
+                </button>
                 <audio id="rain-audio" loop src="https://cdn.freesound.org/previews/346/346618_6002932-lq.mp3"></audio>
                 <!-- Theme Toggle Button -->
                 <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5">
@@ -560,6 +564,26 @@
 
                 
             
+            
+            // Feature 6: Hydration Reminder
+            const waterTimerToggle = document.getElementById('water-timer-toggle');
+            let waterTimerInterval;
+            let isWaterTimerActive = false;
+            if(waterTimerToggle) {
+                waterTimerToggle.addEventListener('click', () => {
+                    isWaterTimerActive = !isWaterTimerActive;
+                    if(isWaterTimerActive) {
+                        waterTimerToggle.classList.add('bg-blue-100', 'dark:bg-blue-900');
+                        waterTimerInterval = setInterval(() => {
+                            alert("💧 Hydration Reminder! Take a moment to drink some water and stretch.");
+                        }, 45 * 60 * 1000); // 45 minutes
+                    } else {
+                        waterTimerToggle.classList.remove('bg-blue-100', 'dark:bg-blue-900');
+                        clearInterval(waterTimerInterval);
+                    }
+                });
+            }
+
             // Feature 1: Ambient Rain Sounds
             const rainToggle = document.getElementById('rain-toggle');
             const rainAudio = document.getElementById('rain-audio');
