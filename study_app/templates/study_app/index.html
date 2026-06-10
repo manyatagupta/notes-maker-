@@ -573,6 +573,25 @@
             
             
             
+            
+            // Feature 5: Alt-Click Quick Highlight
+            document.addEventListener('dblclick', (e) => {
+                if(e.altKey) {
+                    const selection = window.getSelection();
+                    if(selection.rangeCount > 0 && !selection.isCollapsed) {
+                        const range = selection.getRangeAt(0);
+                        const mark = document.createElement('mark');
+                        mark.className = 'bg-green-200 dark:bg-green-800 text-inherit rounded px-1';
+                        try {
+                            range.surroundContents(mark);
+                            selection.removeAllRanges();
+                        } catch(err) {
+                            console.log("Could not highlight selection across elements.");
+                        }
+                    }
+                }
+            });
+
             // Feature 4: Color Tint Themes
             const themeCyclerBtn = document.getElementById('theme-cycler-btn');
             const themes = ['bg-white dark:bg-gray-900', 'bg-green-50 dark:bg-green-900', 'bg-purple-50 dark:bg-purple-900', 'bg-orange-50 dark:bg-orange-900'];
