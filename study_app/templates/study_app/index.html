@@ -565,6 +565,34 @@
                 
             
             
+            
+            // Feature 2: Floating Scratchpad
+            const scratchpadContainer = document.getElementById('scratchpad-container');
+            const scratchpadHeader = document.getElementById('scratchpad-header');
+            const scratchpadIcon = document.getElementById('scratchpad-toggle-icon');
+            const scratchpadText = document.getElementById('scratchpad-text');
+            let isScratchpadOpen = false;
+
+            if (scratchpadHeader && scratchpadText) {
+                const savedNotes = localStorage.getItem('study_scratchpad');
+                if(savedNotes) scratchpadText.value = savedNotes;
+
+                scratchpadText.addEventListener('input', () => {
+                    localStorage.setItem('study_scratchpad', scratchpadText.value);
+                });
+
+                scratchpadHeader.addEventListener('click', () => {
+                    isScratchpadOpen = !isScratchpadOpen;
+                    if(isScratchpadOpen) {
+                        scratchpadContainer.classList.remove('translate-y-[calc(100%-40px)]');
+                        scratchpadIcon.textContent = '▼';
+                    } else {
+                        scratchpadContainer.classList.add('translate-y-[calc(100%-40px)]');
+                        scratchpadIcon.textContent = '▲';
+                    }
+                });
+            }
+
             // Feature 6: Hydration Reminder
             const waterTimerToggle = document.getElementById('water-timer-toggle');
             let waterTimerInterval;
@@ -1908,5 +1936,15 @@
 
         });
     </script>
+
+    <!-- Floating Scratchpad -->
+    <div id="scratchpad-container" class="fixed bottom-4 left-4 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 w-64 transition-transform transform translate-y-[calc(100%-40px)] no-print">
+        <div id="scratchpad-header" class="flex justify-between items-center p-2 bg-gray-100 dark:bg-gray-700 rounded-t-lg cursor-pointer">
+            <span class="font-semibold text-sm">📝 Scratchpad</span>
+            <span id="scratchpad-toggle-icon">▲</span>
+        </div>
+        <textarea id="scratchpad-text" class="w-full h-40 p-2 text-sm bg-transparent border-none focus:ring-0 resize-none dark:text-white" placeholder="Type quick notes here..."></textarea>
+    </div>
+
 </body>
 </html>
