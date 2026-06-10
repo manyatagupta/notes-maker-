@@ -132,6 +132,7 @@
                 <button id="water-timer-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Hydration Reminder">
                     💧
                 </button>
+                <span id="live-clock" class="ml-4 font-mono text-gray-500 dark:text-gray-400 font-bold hidden md:inline-block" title="Current Time">--:--</span>
                 <audio id="rain-audio" loop src="https://cdn.freesound.org/previews/346/346618_6002932-lq.mp3"></audio>
                 <!-- Theme Toggle Button -->
                 <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5">
@@ -566,6 +567,16 @@
             
             
             
+            
+            // Feature 3: Live Study Clock
+            const liveClock = document.getElementById('live-clock');
+            if (liveClock) {
+                setInterval(() => {
+                    const now = new Date();
+                    liveClock.textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                }, 1000);
+            }
+
             // Feature 2: Floating Scratchpad
             const scratchpadContainer = document.getElementById('scratchpad-container');
             const scratchpadHeader = document.getElementById('scratchpad-header');
