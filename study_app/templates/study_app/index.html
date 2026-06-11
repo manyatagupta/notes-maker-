@@ -132,6 +132,9 @@
                 <button id="theme-cycler-btn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Cycle Theme Colors">
                     🎨
                 </button>
+                <button id="confetti-btn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Celebrate!">
+                    🎉
+                </button>
                 <!-- Hydration Reminder Toggle Button -->
                 <button id="water-timer-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Hydration Reminder">
                     💧
@@ -580,6 +583,33 @@
             
             
             
+            
+            // Feature 6: Motivation Confetti Burst
+            const confettiBtn = document.getElementById('confetti-btn');
+            if(confettiBtn) {
+                confettiBtn.addEventListener('click', () => {
+                    for(let i=0; i<50; i++) {
+                        const conf = document.createElement('div');
+                        conf.style.position = 'fixed';
+                        conf.style.width = '10px';
+                        conf.style.height = '10px';
+                        conf.style.backgroundColor = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'][Math.floor(Math.random()*5)];
+                        conf.style.left = Math.random() * 100 + 'vw';
+                        conf.style.top = '-10px';
+                        conf.style.zIndex = '9999';
+                        conf.style.transition = 'transform 3s linear, top 3s linear';
+                        document.body.appendChild(conf);
+                        
+                        setTimeout(() => {
+                            conf.style.top = '100vh';
+                            conf.style.transform = `rotate(${Math.random() * 360 * 3}deg)`;
+                        }, 50);
+                        
+                        setTimeout(() => conf.remove(), 3000);
+                    }
+                });
+            }
+
             // Feature 4: Floating Quick Search
             const quickSearchBtn = document.getElementById('quick-search-btn');
             if(quickSearchBtn) {
