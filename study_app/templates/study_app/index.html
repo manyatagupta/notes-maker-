@@ -1580,6 +1580,15 @@
             let currentFlashcards = [];
 
             function populateResults(data) {
+
+                // Restore scroll
+                if(data.material_id) {
+                    const savedScroll = localStorage.getItem('scrollPos_' + data.material_id);
+                    if(savedScroll) {
+                        setTimeout(() => window.scrollTo({top: parseInt(savedScroll), behavior: 'smooth'}), 300);
+                    }
+                }
+
                 // Feature 2: Estimated Reading Time
                 const wordCount = (data.notes || "").split(/\s+/).length + (data.summary || "").split(/\s+/).length;
                 const readTime = Math.max(1, Math.ceil(wordCount / 200));
