@@ -133,6 +133,10 @@
                     🎨
                 </button>
                 <button id="confetti-btn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Celebrate!">
+                </button>
+                <button id="cheat-sheet-btn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Keyboard Shortcuts">
+                    ⌨️
+                </button>
                     🎉
                 </button>
                 <!-- Hydration Reminder Toggle Button -->
@@ -2108,6 +2112,20 @@
     </button>
 
     
+    
+    <!-- Cheat Sheet Modal -->
+    <div id="cheat-sheet-modal" class="fixed inset-0 z-[110] bg-black bg-opacity-50 hidden flex justify-center items-center">
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full shadow-2xl">
+            <h2 class="text-2xl font-bold mb-4">Keyboard Shortcuts</h2>
+            <ul class="space-y-3">
+                <li class="flex justify-between"><span>Quick Highlight</span> <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-sm">Alt + Double Click</kbd></li>
+                <li class="flex justify-between"><span>Dictionary Tooltip</span> <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-sm">Double Click</kbd></li>
+                <li class="flex justify-between"><span>Google Search</span> <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-sm">Select Text</kbd></li>
+            </ul>
+            <button id="close-cheat-sheet" class="mt-6 w-full bg-blue-600 text-white rounded py-2 font-semibold hover:bg-blue-700">Got it!</button>
+        </div>
+    </div>
+
     <!-- Lightbox Container -->
     <div id="lightbox-overlay" class="fixed inset-0 z-[100] bg-black bg-opacity-90 hidden flex justify-center items-center cursor-pointer">
         <img id="lightbox-img" class="max-w-full max-h-full object-contain p-4" src="" alt="Zoomed Image">
