@@ -2095,6 +2095,40 @@
                 });
             }
 
+            
+            // Feature 6: Floating Sticky Notes
+            if(notesContent) {
+                notesContent.addEventListener('click', (e) => {
+                    if (e.altKey) {
+                        const sticky = document.createElement('div');
+                        sticky.className = 'absolute bg-yellow-200 text-gray-800 p-2 shadow-md border border-yellow-300 rounded text-sm z-50 min-w-[100px] min-h-[100px] outline-none';
+                        sticky.contentEditable = true;
+                        sticky.style.left = e.pageX + 'px';
+                        sticky.style.top = e.pageY + 'px';
+                        sticky.innerHTML = 'Note...';
+                        document.body.appendChild(sticky);
+                        
+                        // Drag logic
+                        let isDown = false, startX, startY;
+                        sticky.addEventListener('mousedown', (e2) => {
+                            if (e2.target !== sticky) return;
+                            isDown = true;
+                            startX = e2.clientX - sticky.offsetLeft;
+                            startY = e2.clientY - sticky.offsetTop;
+                        });
+                        document.addEventListener('mouseup', () => isDown = false);
+                        document.addEventListener('mousemove', (e2) => {
+                            if (!isDown) return;
+                            sticky.style.left = (e2.clientX - startX) + 'px';
+                            sticky.style.top = (e2.clientY - startY) + 'px';
+                        });
+                        
+                        // Double click to remove
+                        sticky.addEventListener('dblclick', () => sticky.remove());
+                    }
+                });
+            }
+
             document.getElementById('listen-notes-btn')?.addEventListener('click', () => speakText(notesContent.innerHTML));
             document.getElementById('listen-summary-btn')?.addEventListener('click', () => speakText(summaryContent.innerHTML));
 
