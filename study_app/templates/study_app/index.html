@@ -1968,8 +1968,25 @@
                 if (currentUtterance) { window.speechSynthesis.cancel(); }
                 const cleanText = text.replace(/<[^>]+>/g, '').replace(/\[\d+:\d+(:\d+)?\]/g, '');
                 currentUtterance = new SpeechSynthesisUtterance(cleanText);
+                currentUtterance.rate = typeof currentSpeedIndex !== 'undefined' ? speeds[currentSpeedIndex] : 1.0;
                 window.speechSynthesis.speak(currentUtterance);
             }
+            
+            // Feature 1: TTS Speed Controller Logic
+            const speedToggleBtn = document.getElementById('speed-toggle-btn');
+            const speeds = [0.75, 1.0, 1.5, 2.0];
+            let currentSpeedIndex = 1;
+            if(speedToggleBtn) {
+                speedToggleBtn.addEventListener('click', () => {
+                    currentSpeedIndex = (currentSpeedIndex + 1) % speeds.length;
+                    const speed = speeds[currentSpeedIndex];
+                    speedToggleBtn.innerText = speed + 'x';
+                    if (currentUtterance) {
+                        currentUtterance.rate = speed;
+                    }
+                });
+            }
+
             document.getElementById('listen-notes-btn')?.addEventListener('click', () => speakText(notesContent.innerHTML));
             document.getElementById('listen-summary-btn')?.addEventListener('click', () => speakText(summaryContent.innerHTML));
 
