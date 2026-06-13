@@ -342,6 +342,9 @@
                                 <button id="focus-mask-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
                                     🔦 Focus Mask
                                 </button>
+                                <button id="print-notes-btn" class="bg-green-100 hover:bg-green-200 dark:bg-green-800 dark:hover:bg-green-700 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
+                                    🖨️ Print PDF
+                                </button>
                                 <button id="keyword-scanner-btn" class="bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-800 dark:hover:bg-yellow-700 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
                                     🔍 Scan Keywords
                                 </button>
@@ -2030,6 +2033,16 @@
                             n.parentNode.replaceChild(span, n);
                         }
                     });
+                });
+            }
+
+            
+            // Feature 4: Clean Print Notes Mode
+            const printNotesBtn = document.getElementById('print-notes-btn');
+            if(printNotesBtn) {
+                printNotesBtn.addEventListener('click', () => {
+                    document.getElementById('sidebar')?.classList.add('no-print');
+                    window.print();
                 });
             }
 
