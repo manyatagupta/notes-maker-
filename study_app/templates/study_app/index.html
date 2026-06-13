@@ -342,6 +342,9 @@
                                 <button id="focus-mask-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
                                     🔦 Focus Mask
                                 </button>
+                                <button id="keyword-scanner-btn" class="bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-800 dark:hover:bg-yellow-700 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
+                                    🔍 Scan Keywords
+                                </button>
                                 <button id="blur-toggle-btn" class="bg-indigo-200 hover:bg-indigo-300 dark:bg-indigo-700 dark:hover:bg-indigo-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
                                     🌫️ Blur Mode
                                 </button>
@@ -2002,6 +2005,31 @@
                     notesContent.classList.toggle('blur-mode');
                     blurToggleBtn.classList.toggle('bg-indigo-500');
                     blurToggleBtn.classList.toggle('text-white');
+                });
+            }
+
+            
+            // Feature 3: Auto-Keyword Scanner
+            const keywordScannerBtn = document.getElementById('keyword-scanner-btn');
+            if(keywordScannerBtn) {
+                keywordScannerBtn.addEventListener('click', () => {
+                    if(!notesContent) return;
+                    const walker = document.createTreeWalker(notesContent, NodeFilter.SHOW_TEXT, null, false);
+                    const nodes = [];
+                    let node;
+                    while(node = walker.nextNode()) nodes.push(node);
+                    
+                    nodes.forEach(n => {
+                        if (n.parentNode.nodeName === 'SPAN' && n.parentNode.classList.contains('bg-yellow-200')) return; // Already highlighted
+                        if (n.nodeValue.trim() === '') return;
+                        
+                        const regex = /\b([A-Z][a-z]{3,}|\d{2,4})\b/g;
+                        if(n.nodeValue.match(regex)) {
+                            const span = document.createElement('span');
+                            span.innerHTML = n.nodeValue.replace(regex, '<span class="bg-yellow-200 dark:bg-yellow-700 font-medium px-1 rounded">$1</span>');
+                            n.parentNode.replaceChild(span, n);
+                        }
+                    });
                 });
             }
 
