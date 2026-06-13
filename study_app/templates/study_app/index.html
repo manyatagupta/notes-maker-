@@ -57,6 +57,14 @@
         .blur-mode p, .blur-mode li { filter: blur(5px); transition: filter 0.3s; cursor: pointer; }
         .blur-mode p:hover, .blur-mode li:hover { filter: blur(0); }
 
+        
+        @keyframes pulse-breathe {
+            0% { transform: scale(1); opacity: 0.8; }
+            40% { transform: scale(2); opacity: 0.4; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+        .breathe-animate { animation: pulse-breathe 19s infinite ease-in-out; }
+
         /* Flashcard Animations */
         .perspective-1000 {
             perspective: 1000px;
@@ -140,6 +148,10 @@
                 </button>
                 <button id="cheat-sheet-btn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Keyboard Shortcuts">
                     ⌨️
+                </button>
+                
+                <button id="breathe-btn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Breathing Exercise">
+                    🫁
                 </button>
                 <button id="zen-mode-btn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Zen Focus Mode">
                     🧘
@@ -2043,6 +2055,43 @@
                 printNotesBtn.addEventListener('click', () => {
                     document.getElementById('sidebar')?.classList.add('no-print');
                     window.print();
+                });
+            }
+
+            
+            // Feature 5: Breathing Exercise Widget
+            const breatheBtn = document.getElementById('breathe-btn');
+            if(breatheBtn) {
+                breatheBtn.addEventListener('click', () => {
+                    let widget = document.getElementById('breathe-widget');
+                    if(!widget) {
+                        widget = document.createElement('div');
+                        widget.id = 'breathe-widget';
+                        widget.className = 'fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm cursor-pointer';
+                        widget.innerHTML = `<div class="relative flex items-center justify-center">
+                            <div class="absolute w-32 h-32 bg-blue-400 rounded-full breathe-animate"></div>
+                            <div class="relative z-10 text-white font-bold text-xl text-center">
+                                <span id="breathe-text">Inhale (4s)</span>
+                            </div>
+                        </div>`;
+                        document.body.appendChild(widget);
+                        
+                        let step = 0;
+                        const steps = [
+                            { text: "Inhale (4s)", time: 4000 },
+                            { text: "Hold (7s)", time: 7000 },
+                            { text: "Exhale (8s)", time: 8000 }
+                        ];
+                        const updateBreathe = () => {
+                            if(!document.getElementById('breathe-widget')) return;
+                            step = (step + 1) % steps.length;
+                            document.getElementById('breathe-text').innerText = steps[step].text;
+                            setTimeout(updateBreathe, steps[step].time);
+                        };
+                        setTimeout(updateBreathe, steps[0].time);
+                        
+                        widget.addEventListener('click', () => widget.remove());
+                    }
                 });
             }
 
