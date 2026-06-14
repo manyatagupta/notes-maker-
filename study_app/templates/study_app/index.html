@@ -140,6 +140,10 @@
                 <button id="rain-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Ambient Rain Sounds">
                     🌧️
                 </button>
+                <!-- Binaural Beats -->
+                <button id="binaural-btn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Deep Focus Binaural Beats">
+                    🎧
+                </button>
                 <!-- Theme Cycler -->
                 <button id="theme-cycler-btn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Cycle Theme Colors">
                     🎨
@@ -2153,6 +2157,55 @@
                     } else {
                         line.remove();
                         focusLineBtn.classList.remove('bg-blue-500', 'text-white');
+                    }
+                });
+            }
+
+            
+            // Feature 2: Deep Focus Binaural Beats
+            const binauralBtn = document.getElementById('binaural-btn');
+            let audioCtx;
+            let osc1, osc2, gainNode;
+            let isBinauralPlaying = false;
+            
+            if(binauralBtn) {
+                binauralBtn.addEventListener('click', () => {
+                    if(!isBinauralPlaying) {
+                        if(!audioCtx) {
+                            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                            osc1 = audioCtx.createOscillator();
+                            osc2 = audioCtx.createOscillator();
+                            gainNode = audioCtx.createGain();
+                            
+                            osc1.type = 'sine';
+                            osc2.type = 'sine';
+                            // Focus frequency (e.g., 14Hz difference for Beta waves)
+                            osc1.frequency.setValueAtTime(200, audioCtx.currentTime);
+                            osc2.frequency.setValueAtTime(214, audioCtx.currentTime);
+                            
+                            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // very soft
+                            
+                            // Pan left and right
+                            const panLeft = audioCtx.createStereoPanner();
+                            const panRight = audioCtx.createStereoPanner();
+                            panLeft.pan.value = -1;
+                            panRight.pan.value = 1;
+                            
+                            osc1.connect(panLeft).connect(gainNode);
+                            osc2.connect(panRight).connect(gainNode);
+                            gainNode.connect(audioCtx.destination);
+                            
+                            osc1.start();
+                            osc2.start();
+                        } else {
+                            audioCtx.resume();
+                        }
+                        isBinauralPlaying = true;
+                        binauralBtn.classList.add('bg-blue-100', 'dark:bg-blue-900');
+                    } else {
+                        audioCtx.suspend();
+                        isBinauralPlaying = false;
+                        binauralBtn.classList.remove('bg-blue-100', 'dark:bg-blue-900');
                     }
                 });
             }
