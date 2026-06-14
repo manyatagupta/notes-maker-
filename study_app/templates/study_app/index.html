@@ -1731,6 +1731,29 @@
                         });
                     };
 
+                    
+                    const setupAccordions = () => {
+                        const headers = notesContent.querySelectorAll('h2, h3');
+                        headers.forEach(header => {
+                            header.classList.add('cursor-pointer', 'hover:opacity-80', 'transition', 'select-none');
+                            header.title = "Click to collapse/expand";
+                            header.innerHTML = '<span class="text-xs mr-2 transition-transform inline-block">▼</span>' + header.innerHTML;
+                            
+                            header.addEventListener('click', () => {
+                                const arrow = header.querySelector('span');
+                                let sibling = header.nextElementSibling;
+                                let isCollapsed = arrow.style.transform === 'rotate(-90deg)';
+                                
+                                arrow.style.transform = isCollapsed ? 'rotate(0deg)' : 'rotate(-90deg)';
+                                
+                                while(sibling && !['H2', 'H3'].includes(sibling.tagName)) {
+                                    sibling.style.display = isCollapsed ? '' : 'none';
+                                    sibling = sibling.nextElementSibling;
+                                }
+                            });
+                        });
+                    };
+
                     const convertChecklists = () => {
                         const walker = document.createTreeWalker(notesContent, NodeFilter.SHOW_TEXT, null, false);
                         const nodesToReplace = [];
@@ -1791,6 +1814,7 @@
                     // Invocations
                     try { highlightHashtags(); } catch(e) { console.error("Error in highlightHashtags", e); }
                     try { convertChecklists(); } catch(e) { console.error("Error in convertChecklists", e); }
+                    try { setupAccordions(); } catch(e) { console.error("Error in setupAccordions", e); }
                     try { styleBlockquotes(); } catch(e) { console.error("Error in styleBlockquotes", e); }
                     try { setupLightbox(); } catch(e) { console.error("Error in setupLightbox", e); }
                 }
