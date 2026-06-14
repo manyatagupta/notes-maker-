@@ -370,6 +370,9 @@
                                 <button id="hide-img-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2" title="Toggle Images">
                                     🖼️ Hide Images
                                 </button>
+                                <button id="smart-img-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2" title="Invert Images for Dark Mode">
+                                    🌙 Smart Images
+                                </button>
                                 <button id="focus-line-btn" class="bg-blue-100 hover:bg-blue-200 dark:bg-blue-800 dark:hover:bg-blue-700 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
                                     📏 Focus Line
                                 </button>
@@ -2232,6 +2235,24 @@
                         isBinauralPlaying = false;
                         binauralBtn.classList.remove('bg-blue-100', 'dark:bg-blue-900');
                     }
+                });
+            }
+
+            
+            // Feature 5: Smart Dark Mode Images
+            const smartImgBtn = document.getElementById('smart-img-btn');
+            if(smartImgBtn) {
+                smartImgBtn.addEventListener('click', () => {
+                    const imgs = document.querySelectorAll('#notes-content img');
+                    imgs.forEach(img => {
+                        if(img.style.filter.includes('invert')) {
+                            img.style.filter = '';
+                        } else {
+                            img.style.filter = 'invert(1) hue-rotate(180deg) brightness(95%)';
+                        }
+                    });
+                    smartImgBtn.classList.toggle('bg-blue-500');
+                    smartImgBtn.classList.toggle('text-white');
                 });
             }
 
