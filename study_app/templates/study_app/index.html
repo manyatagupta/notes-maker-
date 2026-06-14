@@ -366,6 +366,9 @@
                                 <button id="hide-img-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2" title="Toggle Images">
                                     🖼️ Hide Images
                                 </button>
+                                <button id="focus-line-btn" class="bg-blue-100 hover:bg-blue-200 dark:bg-blue-800 dark:hover:bg-blue-700 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
+                                    📏 Focus Line
+                                </button>
                                 <button id="doc-stats-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2" title="Document Stats">
                                     📊 Stats
                                 </button>
@@ -2125,6 +2128,31 @@
                         
                         // Double click to remove
                         sticky.addEventListener('dblclick', () => sticky.remove());
+                    }
+                });
+            }
+
+            
+            // Feature 1: Focus Line Reader
+            const focusLineBtn = document.getElementById('focus-line-btn');
+            if(focusLineBtn) {
+                focusLineBtn.addEventListener('click', () => {
+                    let line = document.getElementById('focus-line');
+                    if(!line) {
+                        line = document.createElement('div');
+                        line.id = 'focus-line';
+                        line.className = 'fixed left-0 w-full h-[2px] bg-red-500 shadow-sm z-50 pointer-events-none opacity-50';
+                        document.body.appendChild(line);
+                        
+                        document.addEventListener('mousemove', (e) => {
+                            if(document.getElementById('focus-line')) {
+                                document.getElementById('focus-line').style.top = e.clientY + 'px';
+                            }
+                        });
+                        focusLineBtn.classList.add('bg-blue-500', 'text-white');
+                    } else {
+                        line.remove();
+                        focusLineBtn.classList.remove('bg-blue-500', 'text-white');
                     }
                 });
             }
