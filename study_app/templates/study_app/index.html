@@ -140,6 +140,10 @@
                 <button id="rain-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Ambient Rain Sounds">
                     🌧️
                 </button>
+                <!-- Mindfulness Chime -->
+                <button id="chime-btn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="15-min Mindfulness Chime">
+                    🔔
+                </button>
                 <!-- Binaural Beats -->
                 <button id="binaural-btn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Deep Focus Binaural Beats">
                     🎧
@@ -2253,6 +2257,38 @@
                     });
                     smartImgBtn.classList.toggle('bg-blue-500');
                     smartImgBtn.classList.toggle('text-white');
+                });
+            }
+
+            
+            // Feature 6: Mindfulness Chime
+            const chimeBtn = document.getElementById('chime-btn');
+            let chimeInterval = null;
+            if(chimeBtn) {
+                const playChime = () => {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+                    osc.frequency.exponentialRampToValueAtTime(261.63, ctx.currentTime + 1.5);
+                    gain.gain.setValueAtTime(0.5, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
+                    osc.connect(gain).connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 1.5);
+                };
+                
+                chimeBtn.addEventListener('click', () => {
+                    if(chimeInterval) {
+                        clearInterval(chimeInterval);
+                        chimeInterval = null;
+                        chimeBtn.classList.remove('bg-yellow-100', 'dark:bg-yellow-900');
+                    } else {
+                        playChime(); // Play test sound immediately
+                        chimeInterval = setInterval(playChime, 15 * 60 * 1000); // Every 15 mins
+                        chimeBtn.classList.add('bg-yellow-100', 'dark:bg-yellow-900');
+                    }
                 });
             }
 
