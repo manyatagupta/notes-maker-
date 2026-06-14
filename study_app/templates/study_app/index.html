@@ -1854,7 +1854,8 @@
                         const cardDiv = document.createElement('div');
                         cardDiv.className = 'flashcard perspective-1000 w-full h-64';
                         cardDiv.innerHTML = `
-                            <div class="flashcard-inner w-full h-full relative rounded-xl shadow-md border border-gray-100">
+                            <div class="flashcard-inner w-full h-full relative rounded-xl shadow-md border border-gray-100 transition-all duration-300">
+                                <button class="star-btn absolute top-3 right-3 z-10 text-gray-300 hover:text-yellow-400 transition" onclick="event.stopPropagation(); this.closest('.flashcard-inner').classList.toggle('ring-4'); this.closest('.flashcard-inner').classList.toggle('ring-yellow-400'); this.classList.toggle('text-yellow-400'); this.classList.toggle('text-gray-300');" title="Mark as Hard">⭐</button>
                                 <div class="absolute w-full h-full backface-hidden flex items-center justify-center p-6 bg-white dark:bg-gray-800 rounded-xl">
                                     <h3 class="text-xl font-bold text-center text-gray-800 dark:text-white">${card.front}</h3>
                                 </div>
