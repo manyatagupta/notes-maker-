@@ -1859,6 +1859,7 @@
                     currentFlashcards = data.flashcards;
                     document.getElementById('export-csv-btn').classList.remove('hidden');
                     document.getElementById('export-csv-btn').classList.add('flex');
+                    correctCards = 0; totalAttempted = 0; if(document.getElementById('mastery-score')) document.getElementById('mastery-score').innerText = 'Mastery: 0/0';
                     flashcardsContainer.innerHTML = '';
                     data.flashcards.forEach((card, index) => {
                         const cardDiv = document.createElement('div');
@@ -1869,8 +1870,12 @@
                                 <div class="absolute w-full h-full backface-hidden flex items-center justify-center p-6 bg-white dark:bg-gray-800 rounded-xl">
                                     <h3 class="text-xl font-bold text-center text-gray-800 dark:text-white">${card.front}</h3>
                                 </div>
-                                <div class="absolute w-full h-full backface-hidden rotate-y-180 flex items-center justify-center p-6 bg-blue-50 dark:bg-blue-900 rounded-xl overflow-y-auto">
-                                    <p class="text-lg text-center text-gray-700 dark:text-gray-200">${card.back}</p>
+                                <div class="absolute w-full h-full backface-hidden rotate-y-180 flex flex-col items-center justify-center p-6 bg-blue-50 dark:bg-blue-900 rounded-xl overflow-y-auto">
+                                    <p class="text-lg text-center text-gray-700 dark:text-gray-200 mb-4">${card.back}</p>
+                                    <div class="flex space-x-4 mt-auto">
+                                        <button class="bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded-full text-sm transition" onclick="event.stopPropagation(); updateMastery(false, this)">❌ Missed</button>
+                                        <button class="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm transition" onclick="event.stopPropagation(); updateMastery(true, this)">✅ Knew It</button>
+                                    </div>
                                 </div>
                             </div>
                         `;
@@ -2321,6 +2326,21 @@
                     }
                 });
             }
+
+            
+            // Feature 2: Flashcard Mastery Tracker
+            let correctCards = 0;
+            let totalAttempted = 0;
+            window.updateMastery = (isCorrect, btn) => {
+                const buttons = btn.parentElement.querySelectorAll('button');
+                buttons.forEach(b => { b.disabled = true; b.classList.add('opacity-50', 'cursor-not-allowed'); });
+                totalAttempted++;
+                if(isCorrect) correctCards++;
+                const scoreBadge = document.getElementById('mastery-score');
+                if(scoreBadge) {
+                    scoreBadge.innerText = `Mastery: ${correctCards}/${totalAttempted}`;
+                }
+            };
 
             document.getElementById('listen-notes-btn')?.addEventListener('click', () => speakText(notesContent.innerHTML));
             document.getElementById('listen-summary-btn')?.addEventListener('click', () => speakText(summaryContent.innerHTML));
