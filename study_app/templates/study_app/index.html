@@ -380,6 +380,12 @@
                                 <button id="focus-line-btn" class="bg-blue-100 hover:bg-blue-200 dark:bg-blue-800 dark:hover:bg-blue-700 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
                                     📏 Focus Line
                                 </button>
+                                <button id="save-draft-btn" class="bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-800 dark:hover:bg-indigo-700 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
+                                    💾 Save Draft
+                                </button>
+                                <button id="load-draft-btn" class="bg-teal-100 hover:bg-teal-200 dark:bg-teal-800 dark:hover:bg-teal-700 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2 hidden">
+                                    📂 Load Draft
+                                </button>
                                 <button id="highlighter-btn" class="bg-pink-100 hover:bg-pink-200 dark:bg-pink-800 dark:hover:bg-pink-700 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
                                     🖍️ Highlighter
                                 </button>
@@ -2359,6 +2365,26 @@
                     scoreBadge.innerText = `Mastery: ${correctCards}/${totalAttempted}`;
                 }
             };
+
+            
+            // Feature 4: Local Browser Draft Save
+            const saveDraftBtn = document.getElementById('save-draft-btn');
+            const loadDraftBtn = document.getElementById('load-draft-btn');
+            if(saveDraftBtn && loadDraftBtn) {
+                if(localStorage.getItem('notes_draft')) {
+                    loadDraftBtn.classList.remove('hidden');
+                }
+                saveDraftBtn.addEventListener('click', () => {
+                    localStorage.setItem('notes_draft', notesContent.innerHTML);
+                    saveDraftBtn.innerText = '✅ Saved';
+                    loadDraftBtn.classList.remove('hidden');
+                    setTimeout(() => saveDraftBtn.innerText = '💾 Save Draft', 2000);
+                });
+                loadDraftBtn.addEventListener('click', () => {
+                    notesContent.innerHTML = localStorage.getItem('notes_draft');
+                    document.getElementById('result-area').classList.remove('hidden');
+                });
+            }
 
             document.getElementById('listen-notes-btn')?.addEventListener('click', () => speakText(notesContent.innerHTML));
             document.getElementById('listen-summary-btn')?.addEventListener('click', () => speakText(summaryContent.innerHTML));
