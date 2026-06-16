@@ -380,6 +380,9 @@
                                 <button id="focus-line-btn" class="bg-blue-100 hover:bg-blue-200 dark:bg-blue-800 dark:hover:bg-blue-700 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
                                     📏 Focus Line
                                 </button>
+                                <button id="highlighter-btn" class="bg-pink-100 hover:bg-pink-200 dark:bg-pink-800 dark:hover:bg-pink-700 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
+                                    🖍️ Highlighter
+                                </button>
                                 <button id="doc-stats-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2" title="Document Stats">
                                     📊 Stats
                                 </button>
@@ -2288,6 +2291,33 @@
                         playChime(); // Play test sound immediately
                         chimeInterval = setInterval(playChime, 15 * 60 * 1000); // Every 15 mins
                         chimeBtn.classList.add('bg-yellow-100', 'dark:bg-yellow-900');
+                    }
+                });
+            }
+
+            
+            // Feature 1: Magic Marker Highlighter
+            const highlighterBtn = document.getElementById('highlighter-btn');
+            let isHighlighterActive = false;
+            if(highlighterBtn) {
+                highlighterBtn.addEventListener('click', () => {
+                    isHighlighterActive = !isHighlighterActive;
+                    highlighterBtn.classList.toggle('bg-pink-500');
+                    highlighterBtn.classList.toggle('text-white');
+                    notesContent.style.cursor = isHighlighterActive ? 'text' : 'default';
+                });
+                notesContent.addEventListener('mouseup', () => {
+                    if(isHighlighterActive) {
+                        const selection = window.getSelection();
+                        if(!selection.isCollapsed) {
+                            const range = selection.getRangeAt(0);
+                            const mark = document.createElement('mark');
+                            mark.className = 'bg-yellow-300 dark:bg-yellow-600 rounded px-1';
+                            try {
+                                range.surroundContents(mark);
+                            } catch(e) { console.error("Highlight crossed elements"); }
+                            selection.removeAllRanges();
+                        }
                     }
                 });
             }
