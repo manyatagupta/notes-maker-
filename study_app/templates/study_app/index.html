@@ -2386,6 +2386,35 @@
                 });
             }
 
+            
+            // Feature 5: Dictionary Look-up on Double Click
+            notesContent.addEventListener('dblclick', async (e) => {
+                const selection = window.getSelection().toString().trim();
+                if(selection && selection.length > 2 && selection.split(' ').length === 1) { // Single word
+                    try {
+                        const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${selection}`);
+                        if(res.ok) {
+                            const data = await res.json();
+                            const def = data[0]?.meanings[0]?.definitions[0]?.definition;
+                            if(def) {
+                                // Create tooltip
+                                const tooltip = document.createElement('div');
+                                tooltip.className = 'absolute bg-gray-900 text-white text-sm p-3 rounded-lg shadow-lg z-50 max-w-xs';
+                                tooltip.style.left = e.pageX + 'px';
+                                tooltip.style.top = (e.pageY + 20) + 'px';
+                                tooltip.innerHTML = `<strong>${selection}:</strong> ${def}`;
+                                document.body.appendChild(tooltip);
+                                
+                                // Remove on next click
+                                setTimeout(() => {
+                                    document.addEventListener('click', () => tooltip.remove(), {once: true});
+                                }, 100);
+                            }
+                        }
+                    } catch(err) { console.error("Dict error", err); }
+                }
+            });
+
             document.getElementById('listen-notes-btn')?.addEventListener('click', () => speakText(notesContent.innerHTML));
             document.getElementById('listen-summary-btn')?.addEventListener('click', () => speakText(summaryContent.innerHTML));
 
