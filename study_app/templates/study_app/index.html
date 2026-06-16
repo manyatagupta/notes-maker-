@@ -144,6 +144,10 @@
                 <button id="chime-btn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="15-min Mindfulness Chime">
                     🔔
                 </button>
+                <!-- Brown Noise -->
+                <button id="brown-btn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Deep Focus Brown Noise">
+                    🟫
+                </button>
                 <!-- Binaural Beats -->
                 <button id="binaural-btn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Deep Focus Binaural Beats">
                     🎧
@@ -2414,6 +2418,47 @@
                     } catch(err) { console.error("Dict error", err); }
                 }
             });
+
+            
+            // Feature 6: Deep Focus Brown Noise
+            const brownBtn = document.getElementById('brown-btn');
+            let brownCtx, brownNoiseNode;
+            let isBrownPlaying = false;
+            if(brownBtn) {
+                brownBtn.addEventListener('click', () => {
+                    if(!isBrownPlaying) {
+                        if(!brownCtx) {
+                            brownCtx = new (window.AudioContext || window.webkitAudioContext)();
+                            const bufferSize = 2 * brownCtx.sampleRate;
+                            const noiseBuffer = brownCtx.createBuffer(1, bufferSize, brownCtx.sampleRate);
+                            const output = noiseBuffer.getChannelData(0);
+                            let lastOut = 0;
+                            for (let i = 0; i < bufferSize; i++) {
+                                const white = Math.random() * 2 - 1;
+                                output[i] = (lastOut + (0.02 * white)) / 1.02;
+                                lastOut = output[i];
+                                output[i] *= 3.5; // Compensate for gain
+                            }
+                            brownNoiseNode = brownCtx.createBufferSource();
+                            brownNoiseNode.buffer = noiseBuffer;
+                            brownNoiseNode.loop = true;
+                            
+                            const gain = brownCtx.createGain();
+                            gain.gain.value = 0.2;
+                            brownNoiseNode.connect(gain).connect(brownCtx.destination);
+                            brownNoiseNode.start(0);
+                        } else {
+                            brownCtx.resume();
+                        }
+                        isBrownPlaying = true;
+                        brownBtn.classList.add('bg-orange-100', 'dark:bg-orange-900');
+                    } else {
+                        brownCtx.suspend();
+                        isBrownPlaying = false;
+                        brownBtn.classList.remove('bg-orange-100', 'dark:bg-orange-900');
+                    }
+                });
+            }
 
             document.getElementById('listen-notes-btn')?.addEventListener('click', () => speakText(notesContent.innerHTML));
             document.getElementById('listen-summary-btn')?.addEventListener('click', () => speakText(summaryContent.innerHTML));
