@@ -1825,6 +1825,24 @@
                     try { highlightHashtags(); } catch(e) { console.error("Error in highlightHashtags", e); }
                     try { convertChecklists(); } catch(e) { console.error("Error in convertChecklists", e); }
                     try { setupAccordions(); } catch(e) { console.error("Error in setupAccordions", e); }
+                    try { 
+
+                    // Feature 3: Code Snippet Copy Buttons
+                    const pres = notesContent.querySelectorAll('pre');
+                    pres.forEach(pre => {
+                        pre.style.position = 'relative';
+                        const copyBtn = document.createElement('button');
+                        copyBtn.className = 'absolute top-2 right-2 bg-gray-700 text-white text-xs px-2 py-1 rounded hover:bg-gray-600 transition opacity-0 group-hover:opacity-100';
+                        copyBtn.innerText = '📋 Copy';
+                        pre.classList.add('group');
+                        copyBtn.addEventListener('click', () => {
+                            navigator.clipboard.writeText(pre.innerText.replace('📋 Copy', '').trim());
+                            copyBtn.innerText = '✅ Copied';
+                            setTimeout(() => copyBtn.innerText = '📋 Copy', 2000);
+                        });
+                        pre.appendChild(copyBtn);
+                    });
+ } catch(e) { console.error(e); }
                     try { styleBlockquotes(); } catch(e) { console.error("Error in styleBlockquotes", e); }
                     try { setupLightbox(); } catch(e) { console.error("Error in setupLightbox", e); }
                 }
