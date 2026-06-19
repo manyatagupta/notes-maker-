@@ -349,6 +349,9 @@
                                     <button id="line-height-decrease" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 px-1 text-sm font-bold">↕-</button>
                                     <button id="line-height-increase" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 px-1 text-sm font-bold">↕+</button>
                                 </div>
+                                <span id="reading-time-badge" class="mr-2 text-xs font-semibold bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1.5 rounded hidden">
+                                    ⏱️ 0 min read
+                                </span>
                                 <button id="listen-notes-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition">
                                     🔊 Listen
                                 </button>
@@ -1692,6 +1695,15 @@
             let currentFlashcards = [];
 
             function populateResults(data) {
+                // Feature 2: Estimated Reading Time
+                const wordCount = (data.notes || "").split(/\s+/).length + (data.summary || "").split(/\s+/).length;
+                const readTime = Math.max(1, Math.ceil(wordCount / 200));
+                const readBadge = document.getElementById('reading-time-badge');
+                if(readBadge) {
+                    readBadge.textContent = `⏱️ ${readTime} min read`;
+                    readBadge.classList.remove('hidden');
+                }
+
 
                 // Restore scroll
                 if(data.material_id) {
