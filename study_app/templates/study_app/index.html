@@ -352,6 +352,11 @@
                                 <span id="reading-time-badge" class="mr-2 text-xs font-semibold bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1.5 rounded hidden">
                                     ⏱️ 0 min read
                                 </span>
+                                <div class="flex items-center bg-gray-100 dark:bg-gray-800 rounded px-2 py-1 mr-2 border border-gray-200 dark:border-gray-700">
+                                    <button id="font-decrease" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 px-1 text-sm font-bold">A-</button>
+                                    <button id="font-reset" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 px-1 text-sm font-bold">A</button>
+                                    <button id="font-increase" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 px-1 text-sm font-bold">A+</button>
+                                </div>
                                 <button id="listen-notes-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition">
                                     🔊 Listen
                                 </button>
@@ -1316,6 +1321,22 @@
                     }
                 });
             }
+
+            
+            // Feature 3: Font Size Adjuster
+            let currentFontSize = 16;
+            document.getElementById('font-decrease')?.addEventListener('click', () => {
+                currentFontSize = Math.max(12, currentFontSize - 2);
+                if(notesContent) notesContent.style.fontSize = currentFontSize + 'px';
+            });
+            document.getElementById('font-increase')?.addEventListener('click', () => {
+                currentFontSize = Math.min(24, currentFontSize + 2);
+                if(notesContent) notesContent.style.fontSize = currentFontSize + 'px';
+            });
+            document.getElementById('font-reset')?.addEventListener('click', () => {
+                currentFontSize = 16;
+                if(notesContent) notesContent.style.fontSize = currentFontSize + 'px';
+            });
 
             // Feature 5: Reading Progress Bar
             window.addEventListener('scroll', () => {
