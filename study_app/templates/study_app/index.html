@@ -382,6 +382,9 @@
                                 <button id="autoscroll-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
                                     📜 Auto-Scroll
                                 </button>
+                                <button id="focus-mask-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
+                                    🔦 Focus Mask
+                                </button>
                                 <button id="copy-notes-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
                                     📋 Copy
                                 </button>
@@ -390,6 +393,9 @@
                                 </button>
                                 <button id="autoscroll-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
                                     📜 Auto-Scroll
+                                </button>
+                                <button id="focus-mask-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
+                                    🔦 Focus Mask
                                 </button>
                                 <button id="focus-mask-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
                                     🔦 Focus Mask
@@ -1266,6 +1272,40 @@
                 });
             }
 
+            
+            // Feature 4: Focus Mask (Reading Ruler)
+            const maskBtn = document.getElementById('focus-mask-btn');
+            let isMaskActive = false;
+            let maskTop, maskBottom;
+            
+            function focusMaskMove(e) {
+                const slitHeight = 100;
+                if(maskTop) maskTop.style.height = (e.clientY - slitHeight/2) + 'px';
+                if(maskBottom) maskBottom.style.height = (window.innerHeight - e.clientY - slitHeight/2) + 'px';
+            }
+
+            if(maskBtn) {
+                maskBtn.addEventListener('click', () => {
+                    isMaskActive = !isMaskActive;
+                    if(isMaskActive) {
+                        maskTop = document.createElement('div');
+                        maskBottom = document.createElement('div');
+                        const style = 'position:fixed; left:0; width:100%; background:rgba(0,0,0,0.8); z-index:9998; pointer-events:none;';
+                        maskTop.style.cssText = style + 'top:0; height:50%;';
+                        maskBottom.style.cssText = style + 'bottom:0; height:50%;';
+                        document.body.appendChild(maskTop);
+                        document.body.appendChild(maskBottom);
+                        document.addEventListener('mousemove', focusMaskMove);
+                        maskBtn.classList.add('bg-blue-200', 'dark:bg-blue-800');
+                    } else {
+                        if(maskTop) maskTop.remove();
+                        if(maskBottom) maskBottom.remove();
+                        document.removeEventListener('mousemove', focusMaskMove);
+                        maskBtn.classList.remove('bg-blue-200', 'dark:bg-blue-800');
+                    }
+                });
+            }
+
             // Feature 4: Teleprompter Auto-Scroll
             let scrollInterval;
             let isScrolling = false;
@@ -1417,6 +1457,40 @@
             });
 
             
+            
+            // Feature 4: Focus Mask (Reading Ruler)
+            const maskBtn = document.getElementById('focus-mask-btn');
+            let isMaskActive = false;
+            let maskTop, maskBottom;
+            
+            function focusMaskMove(e) {
+                const slitHeight = 100;
+                if(maskTop) maskTop.style.height = (e.clientY - slitHeight/2) + 'px';
+                if(maskBottom) maskBottom.style.height = (window.innerHeight - e.clientY - slitHeight/2) + 'px';
+            }
+
+            if(maskBtn) {
+                maskBtn.addEventListener('click', () => {
+                    isMaskActive = !isMaskActive;
+                    if(isMaskActive) {
+                        maskTop = document.createElement('div');
+                        maskBottom = document.createElement('div');
+                        const style = 'position:fixed; left:0; width:100%; background:rgba(0,0,0,0.8); z-index:9998; pointer-events:none;';
+                        maskTop.style.cssText = style + 'top:0; height:50%;';
+                        maskBottom.style.cssText = style + 'bottom:0; height:50%;';
+                        document.body.appendChild(maskTop);
+                        document.body.appendChild(maskBottom);
+                        document.addEventListener('mousemove', focusMaskMove);
+                        maskBtn.classList.add('bg-blue-200', 'dark:bg-blue-800');
+                    } else {
+                        if(maskTop) maskTop.remove();
+                        if(maskBottom) maskBottom.remove();
+                        document.removeEventListener('mousemove', focusMaskMove);
+                        maskBtn.classList.remove('bg-blue-200', 'dark:bg-blue-800');
+                    }
+                });
+            }
+
             // Feature 4: Teleprompter Auto-Scroll
             let scrollInterval;
             let isScrolling = false;
