@@ -283,6 +283,9 @@
                 <button id="export-md-btn" class="bg-gray-700 hover:bg-gray-800 text-white font-medium px-4 py-2 rounded-lg flex items-center gap-2 text-sm shadow-sm transition mr-2">
                     ⬇️ Save as Markdown
                 </button>
+                <button id="export-md-btn" class="bg-gray-700 hover:bg-gray-800 text-white font-medium px-4 py-2 rounded-lg flex items-center gap-2 text-sm shadow-sm transition mr-2">
+                    ⬇️ Save as Markdown
+                </button>
                 <button id="export-pdf-btn" class="bg-gray-800 hover:bg-gray-900 text-white font-medium px-4 py-2 rounded-lg flex items-center gap-2 text-sm shadow-sm transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                     Save as PDF
@@ -940,6 +943,25 @@
                     document.main.classList.remove('max-w-full');
                 }
             });
+
+            
+            // Feature 2: Download as Markdown
+            const exportMdBtn = document.getElementById('export-md-btn');
+            if(exportMdBtn) {
+                exportMdBtn.addEventListener('click', () => {
+                    let mdContent = "# Study Notes\n\n";
+                    mdContent += "## Notes\n\n" + (notesContent?.innerText || "") + "\n\n";
+                    mdContent += "## Summary\n\n" + (summaryContent?.innerText || "") + "\n";
+                    
+                    const blob = new Blob([mdContent], { type: 'text/markdown' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'study_materials.md';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
+            }
 
             
             // Feature 2: Download as Markdown
