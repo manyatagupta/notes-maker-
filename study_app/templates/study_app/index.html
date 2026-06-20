@@ -353,6 +353,7 @@
                                     <button id="font-reset" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 px-1 text-sm font-bold">A</button>
                                     <button id="font-increase" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 px-1 text-sm font-bold">A+</button>
                                     <button id="dyslexic-btn" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 px-2 text-sm font-bold border-l border-gray-300 dark:border-gray-600 ml-1" title="Dyslexia Friendly Font">OpenDyslexic</button>
+                                    <button id="dyslexic-btn" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 px-2 text-sm font-bold border-l border-gray-300 dark:border-gray-600 ml-1" title="Dyslexia Friendly Font">OpenDyslexic</button>
                                 </div>
                                 <button id="align-toggle" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition mr-2" title="Toggle Justify">
                                     ⫶⫶ Justify
@@ -368,6 +369,7 @@
                                     <button id="font-decrease" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 px-1 text-sm font-bold">A-</button>
                                     <button id="font-reset" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 px-1 text-sm font-bold">A</button>
                                     <button id="font-increase" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 px-1 text-sm font-bold">A+</button>
+                                    <button id="dyslexic-btn" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 px-2 text-sm font-bold border-l border-gray-300 dark:border-gray-600 ml-1" title="Dyslexia Friendly Font">OpenDyslexic</button>
                                 </div>
                                 <button id="listen-notes-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition">
                                     🔊 Listen
@@ -1193,6 +1195,27 @@
                 });
             }
 
+            
+            // Feature 3: Dyslexia-Friendly Font
+            let isDyslexic = false;
+            const dyslexicBtn = document.getElementById('dyslexic-btn');
+            if(dyslexicBtn) {
+                dyslexicBtn.addEventListener('click', () => {
+                    isDyslexic = !isDyslexic;
+                    const val = isDyslexic ? "'Comic Sans MS', 'OpenDyslexic', sans-serif" : "";
+                    const spacing = isDyslexic ? "1px" : "";
+                    if(notesContent) {
+                        notesContent.style.fontFamily = val;
+                        notesContent.style.letterSpacing = spacing;
+                    }
+                    if(summaryContent) {
+                        summaryContent.style.fontFamily = val;
+                        summaryContent.style.letterSpacing = spacing;
+                    }
+                    dyslexicBtn.classList.toggle('text-blue-600', isDyslexic);
+                });
+            }
+
             // Feature 3: Font Size Adjuster
             let currentFontSize = 16;
             document.getElementById('font-decrease')?.addEventListener('click', () => {
@@ -1357,6 +1380,27 @@
             }
 
             
+            
+            // Feature 3: Dyslexia-Friendly Font
+            let isDyslexic = false;
+            const dyslexicBtn = document.getElementById('dyslexic-btn');
+            if(dyslexicBtn) {
+                dyslexicBtn.addEventListener('click', () => {
+                    isDyslexic = !isDyslexic;
+                    const val = isDyslexic ? "'Comic Sans MS', 'OpenDyslexic', sans-serif" : "";
+                    const spacing = isDyslexic ? "1px" : "";
+                    if(notesContent) {
+                        notesContent.style.fontFamily = val;
+                        notesContent.style.letterSpacing = spacing;
+                    }
+                    if(summaryContent) {
+                        summaryContent.style.fontFamily = val;
+                        summaryContent.style.letterSpacing = spacing;
+                    }
+                    dyslexicBtn.classList.toggle('text-blue-600', isDyslexic);
+                });
+            }
+
             // Feature 3: Font Size Adjuster
             let currentFontSize = 16;
             document.getElementById('font-decrease')?.addEventListener('click', () => {
