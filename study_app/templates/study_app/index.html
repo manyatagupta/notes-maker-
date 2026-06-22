@@ -424,6 +424,9 @@
                                 <button id="edit-notes-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition">
                                     ✏️ Edit Notes
                                 </button>
+                                <button id="autoscroll-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
+                                    📜 Auto-Scroll
+                                </button>
                                 <button id="copy-notes-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition ml-2">
                                     📋 Copy
                                 </button>
@@ -1838,6 +1841,25 @@
                 currentFontSize = 16;
                 if(notesContent) notesContent.style.fontSize = currentFontSize + 'px';
             });
+
+            
+            // Feature 4: Teleprompter Auto-Scroll
+            let scrollInterval;
+            let isScrolling = false;
+            const scrollBtn = document.getElementById('autoscroll-btn');
+            if(scrollBtn) {
+                scrollBtn.addEventListener('click', () => {
+                    if(isScrolling) {
+                        clearInterval(scrollInterval);
+                        isScrolling = false;
+                        scrollBtn.classList.remove('bg-blue-200', 'dark:bg-blue-800');
+                    } else {
+                        scrollInterval = setInterval(() => { window.scrollBy(0, 1); }, 30);
+                        isScrolling = true;
+                        scrollBtn.classList.add('bg-blue-200', 'dark:bg-blue-800');
+                    }
+                });
+            }
 
             // Feature 5: Reading Progress Bar
             window.addEventListener('scroll', () => {
