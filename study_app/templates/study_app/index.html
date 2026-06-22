@@ -107,6 +107,15 @@
         <button id="stopwatch-reset" class="hover:text-red-500 text-sm">🔄</button>
     </div>
 
+    
+    <!-- Feature 6: Active Study Stopwatch -->
+    <div id="stopwatch-widget" class="fixed top-24 right-6 bg-white dark:bg-gray-800 shadow-lg rounded-full px-4 py-2 border border-gray-200 dark:border-gray-700 z-50 flex items-center gap-3">
+        <span class="text-sm font-bold text-gray-500">⏱️ Study Time</span>
+        <span id="stopwatch-display" class="font-mono font-bold text-blue-600 dark:text-blue-400">00:00:00</span>
+        <button id="stopwatch-toggle" class="hover:text-green-500 text-sm">▶️</button>
+        <button id="stopwatch-reset" class="hover:text-red-500 text-sm">🔄</button>
+    </div>
+
     <!-- Reading Progress Bar -->
     <div class="fixed top-0 left-0 w-full h-1.5 z-50 bg-transparent pointer-events-none">
         <div id="reading-progress" class="h-full bg-blue-500 w-0 transition-all duration-150"></div>
@@ -1858,6 +1867,40 @@
                         isScrolling = true;
                         scrollBtn.classList.add('bg-blue-200', 'dark:bg-blue-800');
                     }
+                });
+            }
+
+            
+            // Feature 6: Stopwatch
+            let swSeconds = 0;
+            let swInterval = null;
+            const swDisplay = document.getElementById('stopwatch-display');
+            const swToggle = document.getElementById('stopwatch-toggle');
+            const swReset = document.getElementById('stopwatch-reset');
+            
+            function updateSwDisplay() {
+                const h = String(Math.floor(swSeconds / 3600)).padStart(2, '0');
+                const m = String(Math.floor((swSeconds % 3600) / 60)).padStart(2, '0');
+                const s = String(swSeconds % 60).padStart(2, '0');
+                if(swDisplay) swDisplay.textContent = `${h}:${m}:${s}`;
+            }
+            if(swToggle && swReset) {
+                swToggle.addEventListener('click', () => {
+                    if(swInterval) {
+                        clearInterval(swInterval);
+                        swInterval = null;
+                        swToggle.textContent = '▶️';
+                    } else {
+                        swInterval = setInterval(() => { swSeconds++; updateSwDisplay(); }, 1000);
+                        swToggle.textContent = '⏸️';
+                    }
+                });
+                swReset.addEventListener('click', () => {
+                    clearInterval(swInterval);
+                    swInterval = null;
+                    swSeconds = 0;
+                    updateSwDisplay();
+                    swToggle.textContent = '▶️';
                 });
             }
 
