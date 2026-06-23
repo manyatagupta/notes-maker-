@@ -548,6 +548,9 @@
                             <button id="print-flashcards-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg items-center gap-2 text-sm shadow-sm transition ml-2 hidden">
                                 🖨️ Print Flashcards
                             </button>
+                            <button id="print-flashcards-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg items-center gap-2 text-sm shadow-sm transition ml-2 hidden">
+                                🖨️ Print Flashcards
+                            </button>
                             <button id="shuffle-flashcards-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg items-center gap-2 text-sm shadow-sm transition ml-2 hidden">
                                 🔀 Shuffle Cards
                             </button>
@@ -2538,6 +2541,38 @@
                     } catch(err) {
                         dictDef.textContent = "Error fetching definition.";
                     }
+                });
+            }
+
+            
+            // Feature 6: Print-Ready Flashcards
+            const printFlashBtn = document.getElementById('print-flashcards-btn');
+            if(printFlashBtn) {
+                printFlashBtn.addEventListener('click', () => {
+                    document.body.classList.add('cheat-sheet-mode');
+                    const style = document.createElement('style');
+                    style.id = 'print-flash-style';
+                    style.innerHTML = `
+                        @media print {
+                            body * { visibility: hidden; }
+                            #results-container, #flashcards-tab, #flashcards-container, #flashcards-container * { visibility: visible; }
+                            #results-container { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
+                            .tab-content { display: block !important; }
+                            .no-print, nav, #video-player, iframe, .tab-btn { display: none !important; }
+                            #flashcards-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+                            .flashcard { border: 1px dashed #ccc; padding: 20px; page-break-inside: avoid; min-height: 150px; }
+                            .flashcard-inner { transform: none !important; }
+                            .rotate-y-180 { transform: none !important; display: block; margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; }
+                            .backface-hidden { backface-visibility: visible; position: static; }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                    window.print();
+                    setTimeout(() => {
+                        document.body.classList.remove('cheat-sheet-mode');
+                        const s = document.getElementById('print-flash-style');
+                        if (s) s.remove();
+                    }, 1000);
                 });
             }
 
