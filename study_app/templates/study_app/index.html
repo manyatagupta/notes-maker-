@@ -2291,6 +2291,42 @@
             scrollTopBtn?.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
             scrollBottomBtn?.addEventListener('click', () => window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'}));
 
+            
+            // Feature 1: Dictionary Tooltip on Double-Click
+            const dictPopup = document.getElementById('dict-popup');
+            const dictWord = document.getElementById('dict-word');
+            const dictDef = document.getElementById('dict-def');
+            const dictClose = document.getElementById('dict-close');
+            
+            if (dictPopup && dictClose) {
+                dictClose.addEventListener('click', () => dictPopup.classList.add('hidden'));
+                
+                document.addEventListener('dblclick', async (e) => {
+                    const selection = window.getSelection().toString().trim();
+                    if (!selection || selection.split(' ').length > 1) return;
+                    
+                    const rect = window.getSelection().getRangeAt(0).getBoundingClientRect();
+                    dictPopup.style.top = (rect.bottom + window.scrollY + 10) + 'px';
+                    dictPopup.style.left = (rect.left + window.scrollX) + 'px';
+                    
+                    dictWord.textContent = selection;
+                    dictDef.textContent = "Loading...";
+                    dictPopup.classList.remove('hidden');
+                    
+                    try {
+                        const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${selection}`);
+                        const data = await res.json();
+                        if(Array.isArray(data) && data[0].meanings.length > 0) {
+                            dictDef.textContent = data[0].meanings[0].definitions[0].definition;
+                        } else {
+                            dictDef.textContent = "Definition not found.";
+                        }
+                    } catch(err) {
+                        dictDef.textContent = "Error fetching definition.";
+                    }
+                });
+            }
+
             // Feature 3: Keyboard Shortcuts
             document.addEventListener('keydown', (e) => {
                 // Esc to close widgets
