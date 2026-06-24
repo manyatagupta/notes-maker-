@@ -447,6 +447,10 @@
                                     <button id="font-increase" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 px-1 text-sm font-bold">A+</button>
                                     <button id="dyslexic-btn" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 px-2 text-sm font-bold border-l border-gray-300 dark:border-gray-600 ml-1" title="Dyslexia Friendly Font">OpenDyslexic</button>
                                 </div>
+                                <div class="flex items-center bg-gray-100 dark:bg-gray-800 rounded px-2 py-1 mr-2 border border-gray-200 dark:border-gray-700">
+                                    <button id="line-height-decrease" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 px-1 text-sm font-bold">↕-</button>
+                                    <button id="line-height-increase" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 px-1 text-sm font-bold">↕+</button>
+                                </div>
                                 <button id="listen-notes-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-3 py-1.5 rounded text-sm transition">
                                     🔊 Listen
                                 </button>
@@ -1440,6 +1444,18 @@
                 if(notesContent) notesContent.style.lineHeight = currentLineHeight;
             });
 
+            
+            // Feature 3: Line Spacing Adjuster
+            let currentLineHeight = 1.6;
+            document.getElementById('line-height-decrease')?.addEventListener('click', () => {
+                currentLineHeight = Math.max(1.0, currentLineHeight - 0.2);
+                if(notesContent) notesContent.style.lineHeight = currentLineHeight;
+            });
+            document.getElementById('line-height-increase')?.addEventListener('click', () => {
+                currentLineHeight = Math.min(3.0, currentLineHeight + 0.2);
+                if(notesContent) notesContent.style.lineHeight = currentLineHeight;
+            });
+
             // Feature 3: Dyslexia-Friendly Font
             let isDyslexic = false;
             const dyslexicBtn = document.getElementById('dyslexic-btn');
@@ -1491,6 +1507,18 @@
                 if(notesContent) notesContent.style.lineHeight = currentLineHeight;
             });
 
+            
+            // Feature 3: Line Spacing Adjuster
+            let currentLineHeight = 1.6;
+            document.getElementById('line-height-decrease')?.addEventListener('click', () => {
+                currentLineHeight = Math.max(1.0, currentLineHeight - 0.2);
+                if(notesContent) notesContent.style.lineHeight = currentLineHeight;
+            });
+            document.getElementById('line-height-increase')?.addEventListener('click', () => {
+                currentLineHeight = Math.min(3.0, currentLineHeight + 0.2);
+                if(notesContent) notesContent.style.lineHeight = currentLineHeight;
+            });
+
             // Feature 3: Dyslexia-Friendly Font
             let isDyslexic = false;
             const dyslexicBtn = document.getElementById('dyslexic-btn');
@@ -1512,6 +1540,18 @@
             }
 
             
+            
+            // Feature 3: Line Spacing Adjuster
+            let currentLineHeight = 1.6;
+            document.getElementById('line-height-decrease')?.addEventListener('click', () => {
+                currentLineHeight = Math.max(1.0, currentLineHeight - 0.2);
+                if(notesContent) notesContent.style.lineHeight = currentLineHeight;
+            });
+            document.getElementById('line-height-increase')?.addEventListener('click', () => {
+                currentLineHeight = Math.min(3.0, currentLineHeight + 0.2);
+                if(notesContent) notesContent.style.lineHeight = currentLineHeight;
+            });
+
             // Feature 3: Dyslexia-Friendly Font
             let isDyslexic = false;
             const dyslexicBtn = document.getElementById('dyslexic-btn');
@@ -1795,6 +1835,18 @@
                 if(notesContent) notesContent.style.lineHeight = currentLineHeight;
             });
 
+            
+            // Feature 3: Line Spacing Adjuster
+            let currentLineHeight = 1.6;
+            document.getElementById('line-height-decrease')?.addEventListener('click', () => {
+                currentLineHeight = Math.max(1.0, currentLineHeight - 0.2);
+                if(notesContent) notesContent.style.lineHeight = currentLineHeight;
+            });
+            document.getElementById('line-height-increase')?.addEventListener('click', () => {
+                currentLineHeight = Math.min(3.0, currentLineHeight + 0.2);
+                if(notesContent) notesContent.style.lineHeight = currentLineHeight;
+            });
+
             // Feature 3: Dyslexia-Friendly Font
             let isDyslexic = false;
             const dyslexicBtn = document.getElementById('dyslexic-btn');
@@ -1816,6 +1868,18 @@
             }
 
             
+            
+            // Feature 3: Line Spacing Adjuster
+            let currentLineHeight = 1.6;
+            document.getElementById('line-height-decrease')?.addEventListener('click', () => {
+                currentLineHeight = Math.max(1.0, currentLineHeight - 0.2);
+                if(notesContent) notesContent.style.lineHeight = currentLineHeight;
+            });
+            document.getElementById('line-height-increase')?.addEventListener('click', () => {
+                currentLineHeight = Math.min(3.0, currentLineHeight + 0.2);
+                if(notesContent) notesContent.style.lineHeight = currentLineHeight;
+            });
+
             // Feature 3: Dyslexia-Friendly Font
             let isDyslexic = false;
             const dyslexicBtn = document.getElementById('dyslexic-btn');
@@ -2035,6 +2099,18 @@
 
             
             
+            
+            // Feature 3: Line Spacing Adjuster
+            let currentLineHeight = 1.6;
+            document.getElementById('line-height-decrease')?.addEventListener('click', () => {
+                currentLineHeight = Math.max(1.0, currentLineHeight - 0.2);
+                if(notesContent) notesContent.style.lineHeight = currentLineHeight;
+            });
+            document.getElementById('line-height-increase')?.addEventListener('click', () => {
+                currentLineHeight = Math.min(3.0, currentLineHeight + 0.2);
+                if(notesContent) notesContent.style.lineHeight = currentLineHeight;
+            });
+
             // Feature 3: Dyslexia-Friendly Font
             let isDyslexic = false;
             const dyslexicBtn = document.getElementById('dyslexic-btn');
