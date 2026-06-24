@@ -664,6 +664,17 @@
         </button>
     </div>
 
+    
+    <!-- Feature 5: Scroll Buttons -->
+    <div class="fixed right-6 bottom-32 flex flex-col gap-2 z-40">
+        <button id="scroll-top-btn" class="bg-gray-800 text-white p-3 rounded-full shadow-lg hover:bg-gray-700 transition opacity-0 invisible" title="Scroll to Top">
+            ↑
+        </button>
+        <button id="scroll-bottom-btn" class="bg-gray-800 text-white p-3 rounded-full shadow-lg hover:bg-gray-700 transition opacity-0 invisible" title="Scroll to Bottom">
+            ↓
+        </button>
+    </div>
+
     <!-- Pomodoro Timer Widget -->
     <div id="pomodoro-widget" class="fixed bottom-6 right-6 bg-white dark:bg-gray-800 shadow-xl rounded-xl p-4 border border-gray-200 dark:border-gray-700 z-50 flex flex-col items-center gap-2">
         <div class="flex justify-between w-full text-xs font-bold text-gray-500 mb-1">
@@ -2740,6 +2751,28 @@
                     }, 1000);
                 });
             }
+
+            
+            // Feature 5: Scroll Buttons
+            const scrollTopBtn = document.getElementById('scroll-top-btn');
+            const scrollBottomBtn = document.getElementById('scroll-bottom-btn');
+            
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) {
+                    scrollTopBtn?.classList.remove('opacity-0', 'invisible');
+                } else {
+                    scrollTopBtn?.classList.add('opacity-0', 'invisible');
+                }
+                
+                if (window.scrollY + window.innerHeight < document.body.scrollHeight - 300) {
+                    scrollBottomBtn?.classList.remove('opacity-0', 'invisible');
+                } else {
+                    scrollBottomBtn?.classList.add('opacity-0', 'invisible');
+                }
+            });
+            
+            scrollTopBtn?.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+            scrollBottomBtn?.addEventListener('click', () => window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'}));
 
             // Feature 3: Keyboard Shortcuts
             document.addEventListener('keydown', (e) => {
