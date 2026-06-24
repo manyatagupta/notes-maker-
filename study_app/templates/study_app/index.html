@@ -142,9 +142,17 @@
                 <button id="fullscreen-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Fullscreen Mode">
                     ⛶
                 </button>
+                <!-- Sepia Toggle Button -->
+                <button id="sepia-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Blue Light Filter">
+                    ☕
+                </button>
                 <!-- Fullscreen Toggle Button -->
                 <button id="fullscreen-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Fullscreen Mode">
                     ⛶
+                </button>
+                <!-- Sepia Toggle Button -->
+                <button id="sepia-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Blue Light Filter">
+                    ☕
                 </button>
                 <!-- Sepia Toggle Button -->
                 <button id="sepia-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Blue Light Filter">
@@ -157,6 +165,10 @@
                 <!-- Fullscreen Toggle Button -->
                 <button id="fullscreen-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Fullscreen Mode">
                     ⛶
+                </button>
+                <!-- Sepia Toggle Button -->
+                <button id="sepia-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Blue Light Filter">
+                    ☕
                 </button>
                 <!-- Sepia Toggle Button -->
                 <button id="sepia-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2" title="Blue Light Filter">
@@ -1054,6 +1066,23 @@
                         });
                     } else {
                         document.exitFullscreen();
+                    }
+                });
+            }
+
+                
+            // Feature 2: Blue Light Filter (Sepia)
+            const sepiaToggle = document.getElementById('sepia-toggle');
+            let isSepia = false;
+            if (sepiaToggle) {
+                sepiaToggle.addEventListener('click', () => {
+                    isSepia = !isSepia;
+                    if (isSepia) {
+                        document.body.style.filter = 'sepia(0.5) hue-rotate(-30deg)';
+                        sepiaToggle.classList.add('bg-orange-100', 'dark:bg-orange-900');
+                    } else {
+                        document.body.style.filter = '';
+                        sepiaToggle.classList.remove('bg-orange-100', 'dark:bg-orange-900');
                     }
                 });
             }
