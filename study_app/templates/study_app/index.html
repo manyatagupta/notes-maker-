@@ -3717,6 +3717,7 @@
                     notesContent.innerHTML = notesHtml;
                     highlightHashtags();
                     convertChecklists();
+                    styleBlockquotes();
 
                     // Definitions
                     const highlightHashtags = () => {
@@ -3817,8 +3818,10 @@
 
                     // Invocations
                     try { highlightHashtags();
-                    convertChecklists(); } catch(e) { console.error("Error in highlightHashtags", e); }
-                    try { convertChecklists(); } catch(e) { console.error("Error in convertChecklists", e); }
+                    convertChecklists();
+                    styleBlockquotes(); } catch(e) { console.error("Error in highlightHashtags", e); }
+                    try { convertChecklists();
+                    styleBlockquotes(); } catch(e) { console.error("Error in convertChecklists", e); }
                     try { setupAccordions(); } catch(e) { console.error("Error in setupAccordions", e); }
                     try { 
 
