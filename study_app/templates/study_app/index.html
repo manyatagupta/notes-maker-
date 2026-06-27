@@ -1108,6 +1108,18 @@
                 });
             }
 
+            
+            // Feature 2: Scroll Progress Bar
+            const scrollProgress = document.getElementById('scroll-progress');
+            if(scrollProgress) {
+                window.addEventListener('scroll', () => {
+                    const scrollTop = window.scrollY;
+                    const docHeight = document.body.scrollHeight - window.innerHeight;
+                    const scrollPercent = scrollTop / docHeight;
+                    scrollProgress.style.width = Math.min(100, Math.max(0, scrollPercent * 100)) + '%';
+                });
+            }
+
             // Feature 1: Pomodoro Timer
             const pomodoroBtn = document.getElementById('pomodoro-btn');
             let pomodoroInterval;
@@ -1143,6 +1155,18 @@
             }
 
             
+            
+            // Feature 2: Scroll Progress Bar
+            const scrollProgress = document.getElementById('scroll-progress');
+            if(scrollProgress) {
+                window.addEventListener('scroll', () => {
+                    const scrollTop = window.scrollY;
+                    const docHeight = document.body.scrollHeight - window.innerHeight;
+                    const scrollPercent = scrollTop / docHeight;
+                    scrollProgress.style.width = Math.min(100, Math.max(0, scrollPercent * 100)) + '%';
+                });
+            }
+
             // Feature 1: Pomodoro Timer
             const pomodoroBtn = document.getElementById('pomodoro-btn');
             let pomodoroInterval;
