@@ -1097,6 +1097,27 @@
                 });
             }
 
+            
+            // Feature 4: Floating Quick Search
+            const quickSearchBtn = document.getElementById('quick-search-btn');
+            if(quickSearchBtn) {
+                document.addEventListener('selectionchange', () => {
+                    const selection = window.getSelection();
+                    if(selection.rangeCount > 0 && !selection.isCollapsed && selection.toString().trim().length > 0) {
+                        const range = selection.getRangeAt(0).getBoundingClientRect();
+                        quickSearchBtn.style.left = `${range.left + (range.width / 2) - 20}px`;
+                        quickSearchBtn.style.top = `${range.top + window.scrollY - 55}px`;
+                        quickSearchBtn.classList.remove('hidden');
+                        
+                        quickSearchBtn.onclick = () => {
+                            window.open(`https://www.google.com/search?q=${encodeURIComponent(selection.toString().trim())}`, '_blank');
+                        };
+                    } else {
+                        quickSearchBtn.classList.add('hidden');
+                    }
+                });
+            }
+
             // Feature 2: Scroll Progress Bar
             const scrollProgress = document.getElementById('scroll-progress');
             if(scrollProgress) {
@@ -1109,6 +1130,27 @@
             }
 
             
+            
+            // Feature 4: Floating Quick Search
+            const quickSearchBtn = document.getElementById('quick-search-btn');
+            if(quickSearchBtn) {
+                document.addEventListener('selectionchange', () => {
+                    const selection = window.getSelection();
+                    if(selection.rangeCount > 0 && !selection.isCollapsed && selection.toString().trim().length > 0) {
+                        const range = selection.getRangeAt(0).getBoundingClientRect();
+                        quickSearchBtn.style.left = `${range.left + (range.width / 2) - 20}px`;
+                        quickSearchBtn.style.top = `${range.top + window.scrollY - 55}px`;
+                        quickSearchBtn.classList.remove('hidden');
+                        
+                        quickSearchBtn.onclick = () => {
+                            window.open(`https://www.google.com/search?q=${encodeURIComponent(selection.toString().trim())}`, '_blank');
+                        };
+                    } else {
+                        quickSearchBtn.classList.add('hidden');
+                    }
+                });
+            }
+
             // Feature 2: Scroll Progress Bar
             const scrollProgress = document.getElementById('scroll-progress');
             if(scrollProgress) {
@@ -1156,6 +1198,27 @@
 
             
             
+            
+            // Feature 4: Floating Quick Search
+            const quickSearchBtn = document.getElementById('quick-search-btn');
+            if(quickSearchBtn) {
+                document.addEventListener('selectionchange', () => {
+                    const selection = window.getSelection();
+                    if(selection.rangeCount > 0 && !selection.isCollapsed && selection.toString().trim().length > 0) {
+                        const range = selection.getRangeAt(0).getBoundingClientRect();
+                        quickSearchBtn.style.left = `${range.left + (range.width / 2) - 20}px`;
+                        quickSearchBtn.style.top = `${range.top + window.scrollY - 55}px`;
+                        quickSearchBtn.classList.remove('hidden');
+                        
+                        quickSearchBtn.onclick = () => {
+                            window.open(`https://www.google.com/search?q=${encodeURIComponent(selection.toString().trim())}`, '_blank');
+                        };
+                    } else {
+                        quickSearchBtn.classList.add('hidden');
+                    }
+                });
+            }
+
             // Feature 2: Scroll Progress Bar
             const scrollProgress = document.getElementById('scroll-progress');
             if(scrollProgress) {
@@ -4623,6 +4686,12 @@
         <img id="lightbox-img" class="max-w-full max-h-full object-contain p-4" src="" alt="Zoomed Image">
         <button id="lightbox-close" class="absolute top-4 right-4 text-white text-3xl font-bold">&times;</button>
     </div>
+
+    
+    <!-- Floating Quick Search -->
+    <button id="quick-search-btn" class="fixed hidden z-50 bg-white dark:bg-gray-800 shadow-lg rounded-full p-2 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 transition-transform transform hover:scale-110 text-xl" title="Search Google">
+        🔍
+    </button>
 
     <!-- Floating Scratchpad -->
     <div id="scratchpad-container" class="fixed bottom-4 left-4 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 w-64 transition-transform transform translate-y-[calc(100%-40px)] no-print">
