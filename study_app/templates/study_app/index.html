@@ -403,6 +403,9 @@
                 <button id="pomodoro-btn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2 font-mono font-bold" title="Pomodoro Timer">
                     🍅 25:00
                 </button>
+                <button id="pomodoro-btn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 mr-2 font-mono font-bold" title="Pomodoro Timer">
+                    🍅 25:00
+                </button>
                 <audio id="rain-audio" loop src="https://cdn.freesound.org/previews/346/346618_6002932-lq.mp3"></audio>
                 <!-- Theme Toggle Button -->
                 <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5">
@@ -1105,6 +1108,41 @@
                 });
             }
 
+            // Feature 1: Pomodoro Timer
+            const pomodoroBtn = document.getElementById('pomodoro-btn');
+            let pomodoroInterval;
+            let pomodoroTime = 25 * 60;
+            let isPomodoroRunning = false;
+            if(pomodoroBtn) {
+                pomodoroBtn.addEventListener('click', () => {
+                    if(isPomodoroRunning) {
+                        clearInterval(pomodoroInterval);
+                        isPomodoroRunning = false;
+                        pomodoroTime = 25 * 60;
+                        pomodoroBtn.textContent = '🍅 25:00';
+                        pomodoroBtn.classList.remove('text-red-500', 'bg-red-50');
+                    } else {
+                        isPomodoroRunning = true;
+                        pomodoroBtn.classList.add('text-red-500', 'bg-red-50');
+                        pomodoroInterval = setInterval(() => {
+                            pomodoroTime--;
+                            let m = Math.floor(pomodoroTime / 60).toString().padStart(2, '0');
+                            let s = (pomodoroTime % 60).toString().padStart(2, '0');
+                            pomodoroBtn.textContent = `🍅 ${m}:${s}`;
+                            if(pomodoroTime <= 0) {
+                                clearInterval(pomodoroInterval);
+                                alert("🍅 Pomodoro finished! Take a 5 minute break.");
+                                isPomodoroRunning = false;
+                                pomodoroTime = 25 * 60;
+                                pomodoroBtn.textContent = '🍅 25:00';
+                                pomodoroBtn.classList.remove('text-red-500', 'bg-red-50');
+                            }
+                        }, 1000);
+                    }
+                });
+            }
+
+            
             // Feature 1: Pomodoro Timer
             const pomodoroBtn = document.getElementById('pomodoro-btn');
             let pomodoroInterval;
