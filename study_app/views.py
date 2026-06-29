@@ -10,18 +10,24 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models.functions import TruncDate
-from django.db.models import Count
+from django.db.models import Count, Q
 from .utils.youtube import extract_video_id, get_video_transcript
 from .utils.scraper import is_youtube_url, get_article_text
 from .utils.ai_processor import generate_study_materials, chat_with_document, translate_document, eli5_document
 from .models import StudyMaterial, Profile
-from django.db.models import Q
+
 
 def update_streak(user):
     import datetime
     profile, created = Profile.objects.get_or_create(user=user)
     
     last_active = profile.last_active_date
+    if last_active is None:
+        profile.last_active_date = timezone.now().date()
+        profile.current_streak = 1
+        profile.save()
+        return 1
+        
     if isinstance(last_active, datetime.datetime):
         last_active = last_active.date()
         
@@ -35,6 +41,7 @@ def update_streak(user):
         profile.save()
     return profile.current_streak
 
+
 def index(request):
     """
     Renders the main frontend page.
@@ -43,6 +50,7 @@ def index(request):
     if request.user.is_authenticated:
         streak = update_streak(request.user)
     return render(request, 'study_app/index.html', {'streak': streak})
+
 
 @csrf_exempt
 @login_required
@@ -55,6 +63,7 @@ def generate_materials(request):
         try:
             data = json.loads(request.body)
             url = data.get('url', '')
+            difficulty = data.get('difficulty', 'standard')
             
             if not url:
                 return JsonResponse({'error': 'No URL provided.'}, status=400)
@@ -68,7 +77,6 @@ def generate_materials(request):
                     return JsonResponse({'error': 'Invalid YouTube URL.'}, status=400)
                     
                 # Check if this user has already generated materials for this video
-                from .models import StudyMaterial
                 existing_material = StudyMaterial.objects.filter(user=request.user, video_id=video_id).first()
                 if existing_material:
                     return JsonResponse({
@@ -93,12 +101,15 @@ def generate_materials(request):
                 title = f"Article Notes"
             
             # 2. Generate materials using AI
-            materials = generate_study_materials(content_text)
+            materials = generate_study_materials(content_text, difficulty=difficulty)
             
             # 3. Save to database
+            content_type = 'youtube' if is_yt else 'article'
             new_material = StudyMaterial.objects.create(
                 user=request.user,
-                video_id=video_id, # Can be empty for articles
+                video_id=video_id,
+                source_url=url,
+                content_type=content_type,
                 title=title,
                 notes=materials.get('notes', ''),
                 summary=materials.get('summary', ''),
@@ -109,6 +120,7 @@ def generate_materials(request):
             )
             materials['material_id'] = new_material.id
             materials['tags'] = ''
+            materials['title'] = title
             
             # 4. Include video ID for embedding
             if is_yt:
@@ -125,6 +137,7 @@ def generate_materials(request):
             
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
+
 def register(request):
     """
     Handles user registration.
@@ -138,6 +151,7 @@ def register(request):
     else:
         form = UserCreationForm()
     return render(request, 'study_app/register.html', {'form': form})
+
 
 @login_required
 def dashboard(request):
@@ -157,10 +171,15 @@ def dashboard(request):
     # Order by favorite first, then date
     materials = materials.order_by('-is_favorite', '-created_at')
     
+    # Stats
+    total_notes = StudyMaterial.objects.filter(user=request.user).count()
+    mastered_count = StudyMaterial.objects.filter(user=request.user, is_mastered=True).count()
+    
     # Spaced Repetition Logic (Due for Review)
     today = timezone.now().date()
     due_dates = [today - timedelta(days=1), today - timedelta(days=3), today - timedelta(days=7)]
-    due_for_review = materials.filter(
+    due_for_review = StudyMaterial.objects.filter(
+        user=request.user,
         created_at__date__in=due_dates, 
         is_mastered=False
     ).order_by('-created_at')
@@ -177,20 +196,23 @@ def dashboard(request):
     counts_by_date = {item['date'].strftime('%Y-%m-%d'): item['count'] for item in analytics}
     chart_data = [counts_by_date.get(d, 0) for d in dates]
     
-    # Feature 6: Weekly Study Goal
+    # Weekly Study Goal
     notes_generated_this_week = sum(chart_data)
-    weekly_goal = 5 # Default goal
+    weekly_goal = 5
     
     return render(request, 'study_app/dashboard.html', {
         'materials': materials,
         'due_for_review': due_for_review,
         'streak': streak,
+        'total_notes': total_notes,
+        'mastered_count': mastered_count,
         'query': query or '',
         'chart_labels': json.dumps(dates),
         'chart_data': json.dumps(chart_data),
         'notes_generated_this_week': notes_generated_this_week,
         'weekly_goal': weekly_goal
     })
+
 
 @csrf_exempt
 @login_required
@@ -202,6 +224,7 @@ def toggle_favorite(request, material_id):
         return JsonResponse({'is_favorite': material.is_favorite})
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
+
 @csrf_exempt
 @login_required
 def toggle_mastered(request, material_id):
@@ -211,6 +234,7 @@ def toggle_mastered(request, material_id):
         material.save()
         return JsonResponse({'is_mastered': material.is_mastered})
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
 
 @csrf_exempt
 @login_required
@@ -227,6 +251,7 @@ def update_tags(request, material_id):
             return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
+
 @csrf_exempt
 @login_required
 def document_chat(request, material_id):
@@ -234,16 +259,17 @@ def document_chat(request, material_id):
         try:
             data = json.loads(request.body)
             question = data.get('question', '')
+            history = data.get('history', [])
             material = get_object_or_404(StudyMaterial, id=material_id, user=request.user)
             
-            # Combine notes and summary for context
             context_text = f"Title: {material.title}\n\nSummary:\n{material.summary}\n\nNotes:\n{material.notes}"
             
-            answer = chat_with_document(context_text, question)
+            answer = chat_with_document(context_text, question, history=history)
             return JsonResponse({'answer': answer})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
 
 @csrf_exempt
 @login_required
@@ -252,7 +278,7 @@ def translate_content(request, material_id):
         try:
             data = json.loads(request.body)
             target_language = data.get('language', 'Spanish')
-            text_type = data.get('type', 'notes') # 'notes' or 'summary'
+            text_type = data.get('type', 'notes')
             
             material = get_object_or_404(StudyMaterial, id=material_id, user=request.user)
             text_to_translate = material.notes if text_type == 'notes' else material.summary
@@ -262,6 +288,7 @@ def translate_content(request, material_id):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
 
 @csrf_exempt
 @login_required
@@ -280,9 +307,9 @@ def eli5_content(request, material_id):
             return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
+
 @login_required
 def export_word(request, material_id):
-    from .models import StudyMaterial
     material = get_object_or_404(StudyMaterial, id=material_id, user=request.user)
     
     document = Document()
@@ -292,7 +319,7 @@ def export_word(request, material_id):
     document.add_paragraph(material.summary)
     
     document.add_heading('Notes', level=1)
-    # Basic HTML strip for notes (can be improved)
+    # Basic HTML strip for notes
     import re
     notes_text = re.sub('<[^<]+>', '', material.notes)
     document.add_paragraph(notes_text)
@@ -315,9 +342,36 @@ def export_word(request, material_id):
     response['Content-Disposition'] = f'attachment; filename="StudyMaterial_{material_id}.docx"'
     return response
 
+
 def shared_material(request, share_id):
-    from .models import StudyMaterial
     material = get_object_or_404(StudyMaterial, share_id=share_id)
-    # We can render a simplified template or reuse index.html with a flag
     return render(request, 'study_app/shared.html', {'material': material})
 
+
+@csrf_exempt
+@login_required
+def delete_material(request, material_id):
+    """Delete a study material."""
+    if request.method == 'POST':
+        material = get_object_or_404(StudyMaterial, id=material_id, user=request.user)
+        material.delete()
+        return JsonResponse({'status': 'deleted'})
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+
+@csrf_exempt
+def get_raw_video_url(request, video_id):
+    """Extracts the raw video stream URL bypassing embed restrictions."""
+    try:
+        import yt_dlp
+        ydl_opts = {
+            'format': 'best[ext=mp4]/best',
+            'quiet': True,
+            'no_warnings': True,
+        }
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=False)
+            url = info.get('url', '')
+            return JsonResponse({'raw_url': url})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
