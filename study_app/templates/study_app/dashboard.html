@@ -4,262 +4,303 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - StudyMaker AI</title>
+    <meta name="description" content="Your personal study dashboard — track progress, review materials, and achieve your study goals.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-        }
+        tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] } } } }
     </script>
     <script>
         if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
         }
     </script>
+    <style>
+        * { font-family: 'Inter', system-ui, sans-serif; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in-up { animation: fadeInUp 0.5s ease forwards; }
+        .stat-card { transition: all 0.3s; }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.3); border-radius: 3px; }
+    </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 min-h-screen font-sans text-gray-800 dark:text-gray-100 transition-colors duration-200">
-    
+<body class="bg-gray-50 dark:bg-[#0f0f1a] min-h-screen text-gray-800 dark:text-gray-100 transition-colors duration-300">
+
     <!-- Navbar -->
-    <nav class="bg-white dark:bg-gray-800 shadow-sm py-4 transition-colors duration-200">
-        <div class="max-w-5xl mx-auto px-4 flex justify-between items-center">
-            <a href="{% url 'index' %}" class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                <svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 8.56l-1.222.524a1 1 0 000 1.838l7 3a1 1 0 00.788 0l7-3a1 1 0 000-1.838l-1.222-.524-5.384 2.308a1 1 0 01-.788 0L3.31 8.56z"/></svg>
-                StudyMaker AI
+    <nav class="sticky top-0 z-50 bg-white/80 dark:bg-[#0f0f1a]/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-white/5">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+            <a href="{% url 'index' %}" class="flex items-center gap-2.5 group">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 8.56l-1.222.524a1 1 0 000 1.838l7 3a1 1 0 00.788 0l7-3a1 1 0 000-1.838l-1.222-.524-5.384 2.308a1 1 0 01-.788 0L3.31 8.56z"/></svg>
+                </div>
+                <span class="text-lg font-bold bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent">StudyMaker AI</span>
             </a>
-            <div class="flex gap-4 items-center">
-                <div class="flex items-center gap-1 text-orange-500 font-bold" title="Daily Streak">
+            <div class="flex gap-2 items-center">
+                <div class="flex items-center gap-1.5 text-amber-500 font-bold text-sm px-3 py-1.5 bg-amber-50 dark:bg-amber-500/10 rounded-full" title="Daily Streak">
                     🔥 {{ streak|default:"0" }}
                 </div>
-                <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5">
-                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.22 4.22a1 1 0 011.415 0l.708.708a1 1 0 01-1.414 1.414l-.708-.708a1 1 0 010-1.415zM12 10a2 2 0 11-4 0 2 2 0 014 0zM17 10a1 1 0 110 2h-1a1 1 0 110-2h1zm-4.22 4.22a1 1 0 010 1.415l-.708.708a1 1 0 01-1.414-1.414l.708.708a1 1 0 011.415 0zM10 17a1 1 0 11-2 0v-1a1 1 0 112 0v1zm-4.22-4.22a1 1 0 01-1.415 0l-.708-.708a1 1 0 011.414-1.414l.708.708a1 1 0 010 1.415zM3 10a1 1 0 110-2h1a1 1 0 110 2H3zm4.22-4.22a1 1 0 010-1.415l.708-.708a1 1 0 011.414 1.414l-.708.708a1 1 0 01-1.415 0z"></path></svg>
+                <button id="theme-toggle" class="w-9 h-9 rounded-lg flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 transition-all" title="Toggle Theme">
+                    <svg id="theme-icon-dark" class="hidden w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    <svg id="theme-icon-light" class="hidden w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.22 4.22a1 1 0 011.415 0l.708.708a1 1 0 01-1.414 1.414l-.708-.708a1 1 0 010-1.415zM12 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                 </button>
-                <a href="{% url 'index' %}" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">Generate Notes</a>
+                <a href="{% url 'index' %}" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-indigo-500 px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-all">+ New Notes</a>
                 <form method="post" action="{% url 'logout' %}" class="inline">
                     {% csrf_token %}
-                    <button type="submit" class="text-blue-600 dark:text-blue-400 font-medium hover:underline">Logout</button>
+                    <button type="submit" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-red-500 px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-all">Logout</button>
                 </form>
             </div>
         </div>
     </nav>
 
-    <!-- Content -->
-    <div class="max-w-5xl mx-auto px-4 py-8">
-        
-        <!-- Dashboard Header & Goals -->
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-3xl font-bold text-gray-800 dark:text-white">Your Dashboard</h2>
-            <div class="bg-blue-50 dark:bg-blue-900/30 px-4 py-2 rounded-lg border border-blue-100 dark:border-blue-800 flex items-center gap-3">
-                <span class="text-sm font-semibold text-blue-800 dark:text-blue-300">🎯 Weekly Goal:</span>
-                <div class="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                    {% widthratio notes_generated_this_week weekly_goal 100 as progress_percent %}
-                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: {% if progress_percent > '100' %}100{% else %}{{ progress_percent }}{% endif %}%"></div>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="stat-card bg-white dark:bg-white/5 rounded-2xl p-5 border border-gray-200/70 dark:border-white/5 animate-fade-in-up" style="animation-delay: 0.1s">
+                <div class="text-3xl mb-2">🔥</div>
+                <p class="text-2xl font-black text-gray-800 dark:text-white">{{ streak|default:"0" }}</p>
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Day Streak</p>
+            </div>
+            <div class="stat-card bg-white dark:bg-white/5 rounded-2xl p-5 border border-gray-200/70 dark:border-white/5 animate-fade-in-up" style="animation-delay: 0.2s">
+                <div class="text-3xl mb-2">📚</div>
+                <p class="text-2xl font-black text-gray-800 dark:text-white">{{ total_notes|default:"0" }}</p>
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Notes</p>
+            </div>
+            <div class="stat-card bg-white dark:bg-white/5 rounded-2xl p-5 border border-gray-200/70 dark:border-white/5 animate-fade-in-up" style="animation-delay: 0.3s">
+                <div class="text-3xl mb-2">✅</div>
+                <p class="text-2xl font-black text-gray-800 dark:text-white">{{ mastered_count|default:"0" }}</p>
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Mastered</p>
+            </div>
+            <div class="stat-card bg-white dark:bg-white/5 rounded-2xl p-5 border border-gray-200/70 dark:border-white/5 animate-fade-in-up" style="animation-delay: 0.4s">
+                <div class="text-3xl mb-2">🎯</div>
+                <p class="text-2xl font-black text-gray-800 dark:text-white">{{ notes_generated_this_week }} / {{ weekly_goal }}</p>
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Weekly Goal</p>
+                <div class="w-full bg-gray-200 dark:bg-white/10 rounded-full h-1.5 mt-2">
+                    {% widthratio notes_generated_this_week weekly_goal 100 as progress %}
+                    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-1.5 rounded-full transition-all" style="width: {% if progress > 100 %}100{% else %}{{ progress }}{% endif %}%"></div>
                 </div>
-                <span class="text-sm font-bold text-blue-800 dark:text-blue-300">{{ notes_generated_this_week }} / {{ weekly_goal }}</span>
             </div>
         </div>
 
-        
-        <!-- Feature 6: Daily Quote -->
-        <div class="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl shadow-lg p-6 mb-8 text-white relative overflow-hidden">
-            <div class="absolute -right-4 -top-4 opacity-10 text-9xl">"</div>
-            <h3 class="text-sm font-bold uppercase tracking-wider mb-2 opacity-80">Daily Study Motivation</h3>
-            <p id="daily-quote-text" class="text-xl font-medium italic mb-2">"Loading inspiration..."</p>
-            <p id="daily-quote-author" class="text-sm font-semibold opacity-90"></p>
+        <!-- Daily Motivation -->
+        <div class="relative bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 rounded-2xl shadow-lg shadow-indigo-500/20 p-6 mb-8 text-white overflow-hidden animate-fade-in-up" style="animation-delay: 0.5s">
+            <div class="absolute -right-4 -top-4 text-[120px] opacity-10 leading-none">"</div>
+            <h3 class="text-xs font-bold uppercase tracking-widest mb-3 opacity-70">Daily Motivation</h3>
+            <p id="daily-quote" class="text-xl font-semibold italic mb-2 relative z-10"></p>
+            <p id="daily-author" class="text-sm font-medium opacity-80 relative z-10"></p>
         </div>
 
-        <!-- Analytics Chart -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8 border border-gray-100 dark:border-gray-700">
-            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Study Activity (Last 7 Days)</h3>
-            <div class="w-full" style="height: 250px;">
+        <!-- Activity Chart -->
+        <div class="bg-white dark:bg-white/5 rounded-2xl border border-gray-200/70 dark:border-white/5 p-6 mb-8 animate-fade-in-up" style="animation-delay: 0.6s">
+            <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">📊 Study Activity (Last 7 Days)</h3>
+            <div class="w-full" style="height: 220px;">
                 <canvas id="activityChart"></canvas>
             </div>
         </div>
 
+        <!-- Due for Review -->
         {% if due_for_review %}
-        <!-- Spaced Repetition Reminders -->
-        <div class="mb-10 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 rounded-xl p-6">
-            <h3 class="text-xl font-bold text-blue-800 dark:text-blue-300 mb-4 flex items-center gap-2">
-                📅 Due for Review Today
-            </h3>
+        <div class="mb-8 bg-indigo-50 dark:bg-indigo-500/5 border border-indigo-200 dark:border-indigo-500/10 rounded-2xl p-6 animate-fade-in-up">
+            <h3 class="text-lg font-bold text-indigo-800 dark:text-indigo-300 mb-4 flex items-center gap-2">📅 Due for Review</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {% for mat in due_for_review %}
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border-l-4 border-blue-500">
+                <div class="bg-white dark:bg-white/5 rounded-xl p-4 border-l-4 border-indigo-500 shadow-sm">
                     <h4 class="font-bold text-gray-800 dark:text-white truncate" title="{{ mat.title }}">{{ mat.title }}</h4>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Generated on: {{ mat.created_at|date:"M d, Y" }}</p>
-                    <a href="{% url 'index' %}?video_id={{ mat.video_id }}" class="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline">Review Now &rarr;</a>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">{{ mat.created_at|date:"M d, Y" }}</p>
+                    <a href="{% url 'index' %}?video_id={{ mat.video_id }}" class="text-indigo-600 dark:text-indigo-400 text-sm font-medium hover:underline">Review Now →</a>
                 </div>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
 
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-            <h2 class="text-3xl font-bold text-gray-800 dark:text-white">Your Saved Notes</h2>
+        <!-- Search & Saved Notes Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 animate-fade-in-up">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white">📁 Your Saved Notes</h2>
             <form method="get" action="{% url 'dashboard' %}" class="flex gap-2 w-full sm:w-auto">
-                <input type="text" name="q" value="{{ query }}" placeholder="Search notes..." class="w-full sm:w-64 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 outline-none focus:border-blue-500">
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">Search</button>
+                <input type="text" name="q" value="{{ query }}" placeholder="Search notes..." class="w-full sm:w-64 px-4 py-2 rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 text-sm focus:outline-none focus:border-indigo-500 dark:text-white">
+                <button type="submit" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:shadow-lg hover:shadow-indigo-500/25 transition-all">Search</button>
             </form>
         </div>
-        
+
+        <!-- Materials Grid -->
         {% if materials %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {% for mat in materials %}
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 hover:shadow-lg transition">
-                <div class="flex justify-between items-start mb-2">
-                    <h3 class="font-bold text-lg text-gray-800 dark:text-white truncate pr-2" title="{{ mat.title }}">{{ mat.title }}</h3>
-                    <div class="flex gap-2 items-center">
-                        <button class="mastered-btn text-xl focus:outline-none hover:scale-110 transition-transform" data-id="{{ mat.id }}" title="Mark as Mastered">
+            <div class="group bg-white dark:bg-white/5 rounded-2xl border border-gray-200/70 dark:border-white/5 p-5 hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-1 transition-all duration-300 animate-fade-in-up" id="card-{{ mat.id }}">
+                <div class="flex justify-between items-start mb-3">
+                    <h3 class="font-bold text-gray-800 dark:text-white truncate pr-2 flex-1" title="{{ mat.title }}">{{ mat.title }}</h3>
+                    <div class="flex gap-1 items-center shrink-0">
+                        <button class="mastered-btn w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100 dark:hover:bg-white/5 transition-all text-lg" data-id="{{ mat.id }}" title="Mark as Mastered">
                             {% if mat.is_mastered %}✅{% else %}⚪{% endif %}
                         </button>
-                        <button class="favorite-btn text-2xl focus:outline-none hover:scale-110 transition-transform" data-id="{{ mat.id }}" title="Toggle Favorite">
+                        <button class="favorite-btn w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100 dark:hover:bg-white/5 transition-all text-lg" data-id="{{ mat.id }}" title="Toggle Favorite">
                             {% if mat.is_favorite %}⭐{% else %}☆{% endif %}
+                        </button>
+                        <button class="delete-btn w-8 h-8 rounded-lg flex items-center justify-center hover:bg-red-50 dark:hover:bg-red-500/10 transition-all text-lg opacity-0 group-hover:opacity-100" data-id="{{ mat.id }}" title="Delete">
+                            🗑️
                         </button>
                     </div>
                 </div>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">{{ mat.created_at|date:"M d, Y" }}</p>
-                <div class="mb-4">
-                    <input type="text" class="tag-input w-full px-2 py-1 text-sm border rounded bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500" data-id="{{ mat.id }}" value="{{ mat.tags|default:'' }}" placeholder="Add tags (e.g. #math, #science)...">
-                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">{{ mat.created_at|date:"M d, Y" }}</p>
+                <input type="text" class="tag-input w-full px-3 py-1.5 text-xs rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 dark:text-white focus:outline-none focus:border-indigo-500 mb-4 transition-colors" data-id="{{ mat.id }}" value="{{ mat.tags|default:'' }}" placeholder="Add tags (e.g. #math, #science)...">
                 <div class="flex gap-2">
-                    <a href="{% url 'index' %}?video_id={{ mat.video_id }}" class="bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-900 transition">View Details</a>
-                    <a href="https://youtube.com/watch?v={{ mat.video_id }}" target="_blank" class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-600 transition">Watch</a>
+                    <a href="{% url 'index' %}?video_id={{ mat.video_id }}" class="flex-1 text-center bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-3 py-2 rounded-xl text-xs font-medium hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-colors">View Details</a>
+                    {% if mat.video_id %}
+                    <a href="https://youtube.com/watch?v={{ mat.video_id }}" target="_blank" class="bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-xl text-xs font-medium hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">Watch</a>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-12 text-center border border-gray-200 dark:border-gray-700">
-            <svg class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-            <h3 class="text-lg font-medium text-gray-800 dark:text-white mb-2">No notes yet</h3>
-            <p class="text-gray-500 dark:text-gray-400 mb-6">You haven't generated any study materials yet.</p>
-            <a href="{% url 'index' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-lg transition-colors">Create Your First Notes</a>
+        <div class="bg-white dark:bg-white/5 rounded-2xl border border-gray-200/70 dark:border-white/5 p-16 text-center animate-fade-in-up">
+            <div class="text-6xl mb-4">📝</div>
+            <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-2">No notes yet</h3>
+            <p class="text-gray-500 dark:text-gray-400 mb-6 text-sm">You haven't generated any study materials yet.</p>
+            <a href="{% url 'index' %}" class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium px-6 py-2.5 rounded-xl text-sm hover:shadow-lg hover:shadow-indigo-500/25 transition-all">Create Your First Notes</a>
         </div>
         {% endif %}
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-            const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
-            const themeToggleBtn = document.getElementById('theme-toggle');
+    document.addEventListener('DOMContentLoaded', () => {
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const darkIcon = document.getElementById('theme-icon-dark');
+        const lightIcon = document.getElementById('theme-icon-light');
 
+        function updateThemeIcons() {
             if (document.documentElement.classList.contains('dark')) {
-                themeToggleLightIcon.classList.remove('hidden');
+                lightIcon.classList.remove('hidden');
+                darkIcon.classList.add('hidden');
             } else {
-                themeToggleDarkIcon.classList.remove('hidden');
+                darkIcon.classList.remove('hidden');
+                lightIcon.classList.add('hidden');
             }
+        }
+        updateThemeIcons();
 
-            themeToggleBtn.addEventListener('click', function() {
-                themeToggleDarkIcon.classList.toggle('hidden');
-                themeToggleLightIcon.classList.toggle('hidden');
-                document.documentElement.classList.toggle('dark');
-                if (document.documentElement.classList.contains('dark')) {
-                    localStorage.setItem('color-theme', 'dark');
-                } else {
-                    localStorage.setItem('color-theme', 'light');
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('color-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+            updateThemeIcons();
+        });
+
+        // Daily Quote
+        const quotes = [
+            { text: "The beautiful thing about learning is that no one can take it away from you.", author: "B.B. King" },
+            { text: "Education is the most powerful weapon which you can use to change the world.", author: "Nelson Mandela" },
+            { text: "The expert in anything was once a beginner.", author: "Helen Hayes" },
+            { text: "Learning is not attained by chance, it must be sought for with ardor.", author: "Abigail Adams" },
+            { text: "The more that you read, the more things you will know.", author: "Dr. Seuss" },
+            { text: "An investment in knowledge pays the best interest.", author: "Benjamin Franklin" },
+            { text: "Study hard what interests you the most in the most undisciplined, irreverent and original manner.", author: "Richard Feynman" },
+            { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+            { text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius" },
+            { text: "Success is the sum of small efforts, repeated day in and day out.", author: "Robert Collier" },
+        ];
+        const dayIndex = new Date().getDate() % quotes.length;
+        document.getElementById('daily-quote').textContent = `"${quotes[dayIndex].text}"`;
+        document.getElementById('daily-author').textContent = `— ${quotes[dayIndex].author}`;
+
+        // Activity Chart
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        const chartLabels = JSON.parse('{{ chart_labels|safe|default:"[]" }}');
+        const chartData = JSON.parse('{{ chart_data|safe|default:"[]" }}');
+
+        const gradient = ctx.createLinearGradient(0, 0, 0, 220);
+        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.8)');
+        gradient.addColorStop(1, 'rgba(139, 92, 246, 0.3)');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartLabels.map(d => { const parts = d.split('-'); return `${parts[1]}/${parts[2]}`; }),
+                datasets: [{
+                    label: 'Notes Generated',
+                    data: chartData,
+                    backgroundColor: gradient,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1, color: '#9ca3af' }, grid: { color: 'rgba(156, 163, 175, 0.1)' } },
+                    x: { ticks: { color: '#9ca3af' }, grid: { display: false } }
                 }
-            });
+            }
+        });
 
-            // Favorite Toggle Logic
-            document.querySelectorAll('.favorite-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const materialId = btn.getAttribute('data-id');
-                    try {
-                        const res = await fetch(`/toggle_favorite/${materialId}/`, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRFToken': '{{ csrf_token }}'
-                            }
-                        });
-                        const data = await res.json();
-                        if (data.is_favorite) {
-                            btn.textContent = '⭐';
-                        } else {
-                            btn.textContent = '☆';
-                        }
-                    } catch(e) {
-                        console.error('Error toggling favorite', e);
-                    }
-                });
-            });
-
-            // Mastered Toggle Logic
-            document.querySelectorAll('.mastered-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const materialId = btn.getAttribute('data-id');
-                    try {
-                        const res = await fetch(`/toggle_mastered/${materialId}/`, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRFToken': '{{ csrf_token }}'
-                            }
-                        });
-                        const data = await res.json();
-                        if (data.is_mastered) {
-                            btn.textContent = '✅';
-                            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-                        } else {
-                            btn.textContent = '⚪';
-                        }
-                    } catch(e) {
-                        console.error('Error toggling mastered', e);
-                    }
-                });
-            });
-
-            // Analytics Chart
-            const ctx = document.getElementById('activityChart').getContext('2d');
-            const chartLabels = JSON.parse('{{ chart_labels|safe|default:"[]" }}');
-            const chartData = JSON.parse('{{ chart_data|safe|default:"[]" }}');
-            
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: chartLabels,
-                    datasets: [{
-                        label: 'Notes Generated',
-                        data: chartData,
-                        backgroundColor: '#3b82f6',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
-                    }
-                }
-            });
-
-            // Tags Logic
-            document.querySelectorAll('.tag-input').forEach(input => {
-                input.addEventListener('change', async () => {
-                    const materialId = input.getAttribute('data-id');
-                    try {
-                        await fetch(`/update_tags/${materialId}/`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': '{{ csrf_token }}'
-                            },
-                            body: JSON.stringify({ tags: input.value })
-                        });
-                        // Optional: Show a brief success indicator
-                        input.classList.add('border-green-500');
-                        setTimeout(() => input.classList.remove('border-green-500'), 1000);
-                    } catch(e) {
-                        console.error('Error updating tags', e);
-                    }
-                });
+        // Favorite Toggle
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.dataset.id;
+                try {
+                    const res = await fetch(`/toggle_favorite/${id}/`, { method: 'POST', headers: { 'X-CSRFToken': '{{ csrf_token }}' } });
+                    const data = await res.json();
+                    btn.textContent = data.is_favorite ? '⭐' : '☆';
+                } catch(e) { console.error('Error toggling favorite', e); }
             });
         });
+
+        // Mastered Toggle
+        document.querySelectorAll('.mastered-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.dataset.id;
+                try {
+                    const res = await fetch(`/toggle_mastered/${id}/`, { method: 'POST', headers: { 'X-CSRFToken': '{{ csrf_token }}' } });
+                    const data = await res.json();
+                    btn.textContent = data.is_mastered ? '✅' : '⚪';
+                    if (data.is_mastered) confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                } catch(e) { console.error('Error toggling mastered', e); }
+            });
+        });
+
+        // Delete
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (!confirm('Are you sure you want to delete this material?')) return;
+                const id = btn.dataset.id;
+                try {
+                    const res = await fetch(`/delete_material/${id}/`, { method: 'POST', headers: { 'X-CSRFToken': '{{ csrf_token }}' } });
+                    if (res.ok) {
+                        const card = document.getElementById(`card-${id}`);
+                        card.style.opacity = '0';
+                        card.style.transform = 'scale(0.9)';
+                        card.style.transition = 'all 0.3s';
+                        setTimeout(() => card.remove(), 300);
+                    }
+                } catch(e) { console.error('Error deleting material', e); }
+            });
+        });
+
+        // Tags
+        document.querySelectorAll('.tag-input').forEach(input => {
+            input.addEventListener('change', async () => {
+                const id = input.dataset.id;
+                try {
+                    await fetch(`/update_tags/${id}/`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                        body: JSON.stringify({ tags: input.value })
+                    });
+                    input.classList.add('border-emerald-500');
+                    setTimeout(() => input.classList.remove('border-emerald-500'), 1000);
+                } catch(e) { console.error('Error updating tags', e); }
+            });
+        });
+    });
     </script>
 </body>
 </html>

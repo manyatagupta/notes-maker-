@@ -4,99 +4,137 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - StudyMaker AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-        }
+        tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] } } } }
     </script>
     <script>
         if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
         }
     </script>
+    <style>
+        * { font-family: 'Inter', system-ui, sans-serif; }
+        .hero-gradient {
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.35;
+            animation: float 20s ease-in-out infinite;
+        }
+        .orb-1 { width: 300px; height: 300px; background: #6366f1; top: 10%; left: 10%; }
+        .orb-2 { width: 250px; height: 250px; background: #a78bfa; bottom: 10%; right: 10%; animation-delay: -7s; }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.6s ease forwards; }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e5e7eb;
+            outline: none;
+            transition: all 0.2s;
+            background-color: transparent;
+            font-size: 0.875rem;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        .dark input[type="text"], .dark input[type="password"] {
+            border-color: rgba(255,255,255,0.1);
+            color: #f3f4f6;
+        }
+        .dark input[type="text"]:focus, .dark input[type="password"]:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+    </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 flex flex-col min-h-screen text-gray-800 dark:text-gray-100 transition-colors duration-200">
-    <nav class="bg-white dark:bg-gray-800 shadow-sm py-4 transition-colors duration-200">
-        <div class="max-w-5xl mx-auto px-4 flex justify-between items-center">
-            <a href="{% url 'index' %}" class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                <svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 8.56l-1.222.524a1 1 0 000 1.838l7 3a1 1 0 00.788 0l7-3a1 1 0 000-1.838l-1.222-.524-5.384 2.308a1 1 0 01-.788 0L3.31 8.56z"/></svg>
-                StudyMaker AI
-            </a>
-            <div class="flex gap-4 items-center">
-                <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5">
-                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.22 4.22a1 1 0 011.415 0l.708.708a1 1 0 01-1.414 1.414l-.708-.708a1 1 0 010-1.415zM12 10a2 2 0 11-4 0 2 2 0 014 0zM17 10a1 1 0 110 2h-1a1 1 0 110-2h1zm-4.22 4.22a1 1 0 010 1.415l-.708.708a1 1 0 01-1.414-1.414l.708.708a1 1 0 011.415 0zM10 17a1 1 0 11-2 0v-1a1 1 0 112 0v1zm-4.22-4.22a1 1 0 01-1.415 0l-.708-.708a1 1 0 011.414-1.414l.708.708a1 1 0 010 1.415zM3 10a1 1 0 110-2h1a1 1 0 110 2H3zm4.22-4.22a1 1 0 010-1.415l.708-.708a1 1 0 011.414 1.414l-.708.708a1 1 0 01-1.415 0z"></path></svg>
-                </button>
-                <a href="{% url 'register' %}" class="text-blue-600 dark:text-blue-400 font-medium hover:underline">Register</a>
+<body class="min-h-screen flex">
+    <!-- Left Panel: Gradient -->
+    <div class="hidden lg:flex lg:w-1/2 hero-gradient relative items-center justify-center overflow-hidden">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="relative z-10 max-w-md text-center px-8">
+            <div class="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center mx-auto mb-6 border border-white/10">
+                <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 8.56l-1.222.524a1 1 0 000 1.838l7 3a1 1 0 00.788 0l7-3a1 1 0 000-1.838l-1.222-.524-5.384 2.308a1 1 0 01-.788 0L3.31 8.56z"/></svg>
             </div>
+            <h2 class="text-3xl font-black text-white mb-4">Welcome Back</h2>
+            <p class="text-gray-300 text-sm leading-relaxed">Sign in to access your AI-generated study materials, flashcards, quizzes, and mind maps.</p>
         </div>
-    </nav>
-    <main class="flex-grow flex items-center justify-center p-4">
-        <div class="max-w-md w-full bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-            <h2 class="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">Login to your account</h2>
-            <form method="post" class="space-y-4">
+    </div>
+
+    <!-- Right Panel: Form -->
+    <div class="w-full lg:w-1/2 flex items-center justify-center bg-white dark:bg-[#0f0f1a] p-8 transition-colors duration-300">
+        <div class="max-w-sm w-full animate-fade-in">
+            <div class="flex justify-between items-center mb-8">
+                <a href="{% url 'index' %}" class="flex items-center gap-2">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 8.56l-1.222.524a1 1 0 000 1.838l7 3a1 1 0 00.788 0l7-3a1 1 0 000-1.838l-1.222-.524-5.384 2.308a1 1 0 01-.788 0L3.31 8.56z"/></svg>
+                    </div>
+                    <span class="text-lg font-bold bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent">StudyMaker AI</span>
+                </a>
+                <button id="theme-toggle" class="w-9 h-9 rounded-lg flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 transition-all">
+                    <svg id="theme-icon-dark" class="hidden w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    <svg id="theme-icon-light" class="hidden w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.22 4.22a1 1 0 011.415 0l.708.708a1 1 0 01-1.414 1.414l-.708-.708a1 1 0 010-1.415zM12 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                </button>
+            </div>
+
+            <h2 class="text-2xl font-black text-gray-900 dark:text-white mb-1">Sign in</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-8">Enter your credentials to continue</p>
+
+            <form method="post" class="space-y-5">
                 {% csrf_token %}
                 {% if form.errors %}
-                <div class="bg-red-50 text-red-500 p-3 rounded-md text-sm">
+                <div class="bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 p-3 rounded-xl text-sm border border-red-200 dark:border-red-500/20">
                     Invalid username or password.
                 </div>
                 {% endif %}
                 {% for field in form %}
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                        {{ field }}
-                        <div class="text-red-500 text-xs mt-1">{{ field.errors }}</div>
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    <div class="text-red-500 text-xs mt-1">{{ field.errors }}</div>
+                </div>
                 {% endfor %}
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors">Sign In</button>
+                <button type="submit" class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]">Sign In</button>
             </form>
-            <p class="mt-4 text-center text-sm text-gray-600">Don't have an account? <a href="{% url 'register' %}" class="text-blue-600 dark:text-blue-400 font-medium hover:underline">Register</a></p>
+            <p class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">Don't have an account? <a href="{% url 'register' %}" class="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">Register</a></p>
         </div>
-    </main>
-    <!-- Basic styling for default django form fields inside tailwind -->
-    <style>
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.375rem;
-            border: 1px solid #d1d5db;
-            outline: none;
-            transition: border-color 0.2s;
-            background-color: transparent;
-        }
-        input[type="text"]:focus, input[type="password"]:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 1px #3b82f6;
-        }
-        .dark input[type="text"], .dark input[type="password"] {
-            border-color: #4b5563; /* gray-600 */
-            color: #f3f4f6; /* gray-100 */
-        }
-    </style>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-            const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
-            const themeToggleBtn = document.getElementById('theme-toggle');
-
-            if (document.documentElement.classList.contains('dark')) {
-                themeToggleLightIcon.classList.remove('hidden');
-            } else {
-                themeToggleDarkIcon.classList.remove('hidden');
+            const themeToggle = document.getElementById('theme-toggle');
+            const darkIcon = document.getElementById('theme-icon-dark');
+            const lightIcon = document.getElementById('theme-icon-light');
+            function updateIcons() {
+                if (document.documentElement.classList.contains('dark')) { lightIcon.classList.remove('hidden'); darkIcon.classList.add('hidden'); }
+                else { darkIcon.classList.remove('hidden'); lightIcon.classList.add('hidden'); }
             }
-
-            themeToggleBtn.addEventListener('click', function() {
-                themeToggleDarkIcon.classList.toggle('hidden');
-                themeToggleLightIcon.classList.toggle('hidden');
+            updateIcons();
+            themeToggle.addEventListener('click', () => {
                 document.documentElement.classList.toggle('dark');
-                if (document.documentElement.classList.contains('dark')) {
-                    localStorage.setItem('color-theme', 'dark');
-                } else {
-                    localStorage.setItem('color-theme', 'light');
-                }
+                localStorage.setItem('color-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+                updateIcons();
             });
         });
     </script>

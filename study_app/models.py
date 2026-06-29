@@ -13,8 +13,15 @@ class Profile(models.Model):
         return f"{self.user.username} Profile"
 
 class StudyMaterial(models.Model):
+    CONTENT_TYPE_CHOICES = [
+        ('youtube', 'YouTube Video'),
+        ('article', 'Article'),
+    ]
+    
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='study_materials')
-    video_id = models.CharField(max_length=50)
+    video_id = models.CharField(max_length=50, blank=True, default='')
+    source_url = models.URLField(max_length=500, blank=True, default='')
+    content_type = models.CharField(max_length=10, choices=CONTENT_TYPE_CHOICES, default='youtube')
     title = models.CharField(max_length=255, default="YouTube Video Notes")
     notes = models.TextField()
     summary = models.TextField()
@@ -28,8 +35,7 @@ class StudyMaterial(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.video_id}"
+        return f"{self.user.username} - {self.title}"
 
     class Meta:
         ordering = ['-created_at']
-
