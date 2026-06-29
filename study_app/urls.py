@@ -17,4 +17,6 @@ urlpatterns = [
     path('document_chat/<int:material_id>/', views.document_chat, name='document_chat'),
     path('translate_content/<int:material_id>/', views.translate_content, name='translate_content'),
     path('eli5_content/<int:material_id>/', views.eli5_content, name='eli5_content'),
+    path('delete_material/<int:material_id>/', views.delete_material, name='delete_material'),
+    path('get_raw_video_url/<str:video_id>/', views.get_raw_video_url, name='get_raw_video_url'),
 ]
