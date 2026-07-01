@@ -17,6 +17,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles-preset-stars@2/tsparticles.preset.stars.bundle.min.js"></script>
     <script>
         mermaid.initialize({startOnLoad: false, theme: 'default'});
         tailwind.config = {
@@ -184,6 +185,32 @@
             background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 6px; color: #818cf8;
             box-shadow: inset 0 -2px 0 rgba(99, 102, 241, 0.2);
         }
+
+        /* Button Shimmer */
+        .shimmer-btn { position: relative; overflow: hidden; }
+        .shimmer-btn::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent);
+            transform: skewX(-20deg); animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer { 100% { left: 200%; } }
+        
+        /* Particle Canvas */
+        #tsparticles { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: auto; opacity: 0.8; }
+
+        /* Animated Title Shine */
+        .title-shine {
+            background-size: 200% auto;
+            color: #000;
+            background-clip: text;
+            text-fill-color: transparent;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
+            background-image: linear-gradient(to right, #818cf8, #c084fc, #f472b6, #818cf8);
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-[#0f0f1a] min-h-screen text-gray-800 dark:text-gray-100 transition-colors duration-300">
@@ -227,6 +254,7 @@
     <!-- Hero Section -->
     <section id="hero-section" class="relative overflow-hidden">
         <div class="hero-gradient min-h-[70vh] flex items-center justify-center relative">
+            <div id="tsparticles"></div>
             <div class="orb orb-1"></div>
             <div class="orb orb-2"></div>
             <div class="orb orb-3"></div>
@@ -237,7 +265,7 @@
                 </div>
                 <h1 class="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-6 leading-tight tracking-tight">
                     Turn Any Video Into<br>
-                    <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Study Materials</span>
+                    <span class="title-shine">Study Materials</span>
                 </h1>
                 <p class="text-lg text-gray-300 mb-10 max-w-xl mx-auto leading-relaxed">
                     Paste a YouTube video or article URL and get instant notes, summaries, flashcards, quizzes, and mind maps.
@@ -251,7 +279,7 @@
                             <option value="simple" class="text-black">Simple (ELI5)</option>
                             <option value="advanced" class="text-black">Advanced</option>
                         </select>
-                        <button id="generate-btn" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:shadow-lg hover:shadow-indigo-500/30 active:scale-95 flex items-center gap-2">
+                        <button id="generate-btn" class="shimmer-btn bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:shadow-lg hover:shadow-indigo-500/30 active:scale-95 flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                             Generate
                         </button>
@@ -323,8 +351,9 @@
             
             <div class="bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-gray-200/70 dark:border-white/5 overflow-hidden">
                 <div class="p-6 md:p-8" id="tab-content-area">
-                    <div id="content-notes" class="tab-content active prose max-w-none text-gray-700 dark:text-gray-200 leading-relaxed"></div>
-                    <div id="content-summary" class="tab-content prose max-w-none text-gray-700 dark:text-gray-200 text-lg leading-relaxed"></div>
+                        <!-- Tabs Content -->
+                        <div id="content-notes" class="tab-content active prose prose-indigo dark:prose-invert max-w-none text-gray-700 dark:text-gray-300"></div>
+                        <div id="content-summary" class="tab-content prose prose-indigo dark:prose-invert max-w-none text-gray-700 dark:text-gray-300"></div>
                     <div id="content-flashcards" class="tab-content hidden grid grid-cols-1 md:grid-cols-2 gap-6"></div>
                     <div id="content-quiz" class="tab-content">
                         <div id="quiz-score" class="hidden mb-6 p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-500/10 dark:to-teal-500/10 border border-emerald-200 dark:border-emerald-500/20 text-center">
@@ -463,13 +492,20 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
+        // Initialize Particles
+        if (typeof tsParticles !== 'undefined') {
+            tsParticles.load("tsparticles", {
+                preset: "stars",
+                background: { color: "transparent" }
+            });
+        }
+
         // ============ STATE ============
         let currentMaterialId = null;
         let currentShareId = null;
         let currentVideoId = null;
         let quizData = [];
 
-        // ============ THEME TOGGLE ============
         const themeToggle = document.getElementById('theme-toggle');
         const darkIcon = document.getElementById('theme-icon-dark');
         const lightIcon = document.getElementById('theme-icon-light');
